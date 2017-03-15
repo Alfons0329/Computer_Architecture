@@ -44,7 +44,7 @@ output reg    result;
 output reg    cout;
 
 wire [3:0] ALU_control={A_invert,A_invert,operation};
-reg tmpres_add,tmpres_sub,tmpzr,tmpcout,tmpoverflow;
+reg tmpres_add,tmpres_sub,tmpcout;
 full_add fa(src1,src2,cin,tmpres_add,tempcout);
 full_add fa_comp_sub(src1,~src2,cin,tmpres_sub,tempcout);
 /*always@(rst_n)
@@ -96,7 +96,14 @@ begin
       4'b0111:
       begin
 		result<=tmpres_sub;
+		cout<=tmpcout;
       end
+	  default:
+	  begin
+		tmpres_add<=0;
+        tmpres_sub<=0;
+        tmpcout<=0;
+	  end
   endcase
 end
 
