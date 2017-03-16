@@ -30,6 +30,7 @@ module alu_top(
                operation,  //operation      (input)
                result,     //1 bit result   (output)
                cout,       //1 bit carry out(output)
+					out31
                );
 
 input         src1;
@@ -40,13 +41,17 @@ input         B_invert;
 input         cin;
 input [2-1:0] operation;
 
+output wire    out31;
 output reg    result;
 output reg    cout;
 
-wire [3:0] ALU_control={A_invert,A_invert,operation};
-reg tmpres_add,tmpres_sub,tmpcout;
-full_add fa(src1,src2,cin,tmpres_add,tempcout);
-full_add fa_comp_sub(src1,~src2,cin,tmpres_sub,tempcout);
+wire [3:0] ALU_control={A_invert,B_invert,operation};
+wire tmpsrc2,tmpres_add,tmpres_sub,tmpcout;
+
+full_add fa(src1,tmpsrc2,cin,tmpres_add,tmpcout);
+
+assign out31=tmpres_add;
+assign tmpsrc2=(B_invert) ? ~src2 : src2;
 /*always@(rst_n)
 begin
     if(rst_n)
@@ -64,50 +69,50 @@ begin
         tmpoverflow<=0;
     end
 end*/
-always @ (ALU_control) // or maybe * instead?
+always @ (*) // or maybe * instead?
 begin
   case(ALU_control)
       4'b0000:
       begin
-        result<=src1&src2;
+        result=src1&src2;
       end
       4'b0001:
       begin
-        result<=src1|src2;
+        result=src1|src2;
       end
       4'b0010:
       begin
-        result<=tmpres_add;
-        cout<=tmpcout;
+        result=tmpres_add;
+        cout=tmpcout;
       end
       4'b0110:
       begin
-		result<=tmpres_sub;
-        cout<=tmpcout;
+			result=tmpres_add;
+			cout=tmpcout;
       end
       4'b1100:
       begin
-        result<=~(src1|src2);
+        result=~(src1|src2);
       end
       4'b1101:
       begin
-        result<=src1^src2;
+        result=~(src1&src2);
       end
       4'b0111:
       begin
-		result<=tmpres_sub;
-		cout<=tmpcout;
+			result=less;
+			cout=tmpcout;
       end
-	  default:
-	  begin
-		tmpres_add<=0;
-        tmpres_sub<=0;
-        tmpcout<=0;
-	  end
+		default:
+		begin
+			result=0;
+			cout=0;
+		end
   endcase
 end
 
 always@( * )
+	$display("x %d y%d cin%d s%d cout %d",src1,src2,cin,tmpres_add,tmpcout);
 begin
 
 end
