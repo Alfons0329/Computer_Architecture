@@ -47,6 +47,7 @@ output          overflow;
 wire   [32-1:0] result;
 wire   [32-1:0] trans_cout;
 wire    [2-1:0] operation;
+wire out31;
 reg             cout;
 reg             zero;
 reg             overflow;
@@ -97,105 +98,106 @@ assign less = t_less;
   alu_top bit28(.src1(src1[28]),.src2(src2[28]),.less(1'b0),.A_invert(A_invert),.B_invert(B_invert),.cin(trans_cout[27]),.operation(operation),.result(result[28]),.cout(trans_cout[28]));
   alu_top bit29(.src1(src1[29]),.src2(src2[29]),.less(1'b0),.A_invert(A_invert),.B_invert(B_invert),.cin(trans_cout[28]),.operation(operation),.result(result[29]),.cout(trans_cout[29]));
   alu_top bit30(.src1(src1[30]),.src2(src2[30]),.less(1'b0),.A_invert(A_invert),.B_invert(B_invert),.cin(trans_cout[29]),.operation(operation),.result(result[30]),.cout(trans_cout[30]));
-  alu_top bit31(.src1(src1[31]),.src2(src2[31]),.less(1'b0),.A_invert(A_invert),.B_invert(B_invert),.cin(trans_cout[30]),.operation(operation),.result(result[31]),.cout(trans_cout[31]));
-  
+  alu_top bit31(.src1(src1[31]),.src2(src2[31]),.less(1'b0),.A_invert(A_invert),.B_invert(B_invert),.cin(trans_cout[30]),.operation(operation),.result(result[31]),.cout(trans_cout[31]),.out31(out31));
+ 
   always@(*)begin
     if(rst_n)begin
       case(ALU_control)
         4'b0000:
 		begin
-		  t_cin<=0;
-		  t_A_invert<=0;
-		  t_B_invert<=0;
-		  t_operation<=2'b00;
+		  t_cin=0;
+		  t_A_invert=0;
+		  t_B_invert=0;
+		  t_operation=2'b00;
 		end
         4'b0001:
 		begin
-		  t_cin<=0;
-		  t_A_invert<=0;
-		  t_B_invert<=0;
-		  t_operation<=2'b01;  
+		  t_cin=0;
+		  t_A_invert=0;
+		  t_B_invert=0;
+		  t_operation=2'b01;  
 		end
         4'b0010:
 		begin
-		  t_cin<=0;
-		  t_A_invert<=0;
-		  t_B_invert<=0;
-		  t_operation<=2'b10;  
+		  t_cin=0;
+		  t_A_invert=0;
+		  t_B_invert=0;
+		  t_operation=2'b10;  
 		end
         4'b0110:
 		begin
-		  t_cin<=1;
-		  t_A_invert<=0;
-		  t_B_invert<=1;
-		  t_operation<=2'b10;  
+		  t_cin=1;
+		  t_A_invert=0;
+		  t_B_invert=1;
+		  t_operation=2'b10;  
 		end
 		4'b1100:
 		begin
-		  t_cin<=0;
-		  t_A_invert<=1;
-		  t_B_invert<=1;
-		  t_operation<=2'b00;  
+		  t_cin=0;
+		  t_A_invert=1;
+		  t_B_invert=1;
+		  t_operation=2'b00;  
 		end
 		4'b1101:
 		begin
-		  t_cin<=0;
-		  t_A_invert<=1;
-		  t_B_invert<=1;
-		  t_operation<=2'b01; 
+		  t_cin=0;
+		  t_A_invert=1;
+		  t_B_invert=1;
+		  t_operation=2'b01; 
 		end
 		4'b0111:
 		begin
-		  t_cin<=1;
-		  t_A_invert<=0;
-		  t_B_invert<=1;
-		  t_operation<=2'b11;  
+		  t_cin=1;
+		  t_A_invert=0;
+		  t_B_invert=1;
+		  t_operation=2'b11;  
 		end
 		default:
 		begin
-		  t_cin<=0;
-		  t_A_invert<=0;
-		  t_B_invert<=0;
-		  t_operation<=2'b00;
+		  t_cin=0;
+		  t_A_invert=0;
+		  t_B_invert=0;
+		  t_operation=2'b00;
 		end
 	endcase
     end
   end
 
  //set less then
+ 
 always@(*) begin
-  if(rst_n&&ALU_control==4'b0110&&result[31])
+  if(rst_n&&(out31^overflow))
     begin
-    t_less<=1'b1;
+    t_less=1'b1;
 	end
   else
     begin
-    t_less<=1'b0;
+    t_less=1'b0;
 	end
 end
   
 always@(*) begin
-	if(rst_n&&(ALU_control==4'b0010||ALU_control==4'b0110))
-		cout<=trans_cout[31];
+	if(rst_n)
+		cout=trans_cout[31];
 	else
-		cout<=0;	
+		cout=0;	
 end
 
 always@(*)begin
     if(rst_n&&result==32'b0)
-		zero<=1;
+		zero=1;
 	else
-		zero<=0;
+		zero=0;
 end
 
 always@(*)begin
   if(rst_n&&(ALU_control==4'b0010||ALU_control==4'b0110))
     if(trans_cout[31]^trans_cout[30])
-			overflow<=1;
+			overflow=1;
 		else
-			overflow<=0;
+			overflow=0;
 	else
-		overflow<=0;
+		overflow=0;
 end
-  
+ 
 endmodule
