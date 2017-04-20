@@ -18,6 +18,9 @@ input         clk_i;
 input         rst_i;
 
 //Internal Signles
+wire [31:0] pc_add,add1_add2,add1_mux3,pc_im;
+wire [5:0] im_dc,im_aluctrl;
+wire [4:0] rs_rr1,rt_rr1,rt_mux1,rd_mux1;
 
 
 //Greate componentes
@@ -29,10 +32,10 @@ ProgramCounter PC(
 	    );
 	
 Adder Adder1(
-        .src1_i(),     
+        .src1_i(32d'd4),     
 	    .src2_i(),     
 	    .sum_o()    
-	    );
+	    ); // This is PC adder
 	
 Instr_Memory IM(
         .pc_addr_i(),  

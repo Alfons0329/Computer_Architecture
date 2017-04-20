@@ -8,7 +8,7 @@
 //----------------------------------------------
 //Description: 
 //--------------------------------------------------------------------------------
-
+//the adder can be used for program counter
 module Adder(
     src1_i,
 	src2_i,
@@ -22,9 +22,9 @@ output [32-1:0]	 sum_o;
 
 //Internal Signals
 wire    [32-1:0]	 sum_o;
-
+assign sum_o=src1_i+src2_i;
 //Parameter
-    
+
 //Main function
 
 endmodule
