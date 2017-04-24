@@ -38,6 +38,79 @@ reg            Branch_o;
 
 
 //Main function
+always@(*) begin
+	case(instr_op_i)
+		6'h0: 
+		begin //ADD,SUB,MUL,JR,SLLV,SLL
+			ALU_op_o = 3'b010;
+			ALUSrc_o = 0;
+			RegWrite_o = 1;
+			savePC_o = 0;
+			RegDst_o = 1;
+			Branch_o = 0;
+		end
+		6'h8: 
+		begin //ADDI
+			ALU_op_o = 3'b000;
+			ALUSrc_o = 1;
+			RegWrite_o = 1;
+			savePC_o = 0;
+			RegDst_o = 0;
+			Branch_o = 0;
+		end
+		6'h4: 
+		begin //BEQ
+			ALU_op_o = 3'b001;
+			ALUSrc_o = 0;
+			RegWrite_o = 0;
+			savePC_o=0;
+			RegDst_o = 0;
+			Branch_o = 1;
+		end
+		6'h5: begin //BNE;
+			ALU_op_o = 3'b001;
+			ALUSrc_o = 0;
+			RegWrite_o = 0;
+			savePC_o=0;
+			RegDst_o = 0;
+			Branch_o = 1;
+		end
+		6'hd: 
+		begin //ORI
+			ALU_op_o = 3'b100;
+			ALUSrc_o = 1;
+			RegWrite_o = 1;
+			savePC_o=0;
+			RegDst_o = 0;
+			Branch_o = 0;
+		end
+		6'hf: 
+		begin //LUI
+			ALU_op_o = 3'b000;
+			ALUSrc_o = 1;
+			RegWrite_o = 1;
+			savePC_o = 0;
+			RegDst_o = 0;
+			Branch_o = 0;		
+		end
+		6'hf: 
+		begin //LUI
+			ALU_op_o = 3'b000;
+			ALUSrc_o = 1;
+			RegWrite_o = 1;
+			savePC_o=0;
+			RegDst_o = 0;
+			Branch_o = 0;
+			BranchSel = 0;
+			SE = 1;
+			Jump_o = 0;
+			  = 0;
+			  = 0;
+			  = 0;
+		end		
+	endcase
+end
+endmodule
 
 endmodule
 
