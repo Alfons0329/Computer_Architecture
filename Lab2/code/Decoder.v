@@ -85,8 +85,8 @@ always@(*) begin
 			RegDst_o = 0;
 			Branch_o = 0;
 		end
-		6'hf: 
-		begin //LUI
+			6'hf: 
+			begin //LUI
 			ALU_op_o = 3'b101;
 			ALUSrc_o = 1;
 			RegWrite_o = 1;
@@ -96,7 +96,6 @@ always@(*) begin
 		end	
 	endcase
 end
-endmodule
 
 endmodule
 
