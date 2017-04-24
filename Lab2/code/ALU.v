@@ -10,8 +10,8 @@
 //--------------------------------------------------------------------------------
 
 module ALU(
-    src1_i,
-	src2_i,
+    src1_i,//rs
+	src2_i,//rt
 	ctrl_i,
 	result_o,
 	zero_o
@@ -30,6 +30,7 @@ reg    [32-1:0]  result_o;
 wire             zero_o;
 assign zero_o = (result_o == 0) ? 1 : 0 ;
 //Parameter
+//Main function
 always@(*) 
 begin
 	case(ctrl_i) //4'd0~
@@ -47,13 +48,12 @@ begin
 		
 		result_o = src1_i<src2_i?1:0;
 	end
-	//4'd6:result_o = src1_i<<src2_i;//sll(sllv)
-	//	4'd7:result_o = src2_i<<16;//lui
+	4'd6:result_o = src1_i<<src2_i;//sll(sllv)
+	4'd7:result_o = src2_i<<16;//lui
 	4'd8:result_o = src1_i|src2_i;//ori
 	default:result_o = 0;
 	endcase
 end
-//Main function
 
 endmodule
 

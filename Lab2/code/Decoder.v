@@ -41,7 +41,7 @@ reg            Branch_o;
 always@(*) begin
 	case(instr_op_i)
 		6'h0: 
-		begin //ADD,SUB,MUL,JR,SLLV,SLL
+		begin //ADD,SUB,MUL,JR,SLLV,SLL,The R type instrucitons
 			ALU_op_o = 3'b010;
 			ALUSrc_o = 0;
 			RegWrite_o = 1;
@@ -67,8 +67,9 @@ always@(*) begin
 			RegDst_o = 0;
 			Branch_o = 1;
 		end
-		6'h5: begin //BNE;
-			ALU_op_o = 3'b001;
+		6'h5: 
+		begin //BNE;
+			ALU_op_o = 3'b011;
 			ALUSrc_o = 0;
 			RegWrite_o = 0;
 			savePC_o=0;
@@ -86,22 +87,13 @@ always@(*) begin
 		end
 		6'hf: 
 		begin //LUI
-			ALU_op_o = 3'b000;
+			ALU_op_o = 3'b101;
 			ALUSrc_o = 1;
 			RegWrite_o = 1;
 			savePC_o = 0;
 			RegDst_o = 0;
 			Branch_o = 0;		
-		end
-		6'hf: 
-		begin //LUI
-			ALU_op_o = 3'b000;
-			ALUSrc_o = 1;
-			RegWrite_o = 1;
-			savePC_o=0;
-			RegDst_o = 0;
-			Branch_o = 0;
-		end		
+		end	
 	endcase
 end
 endmodule
