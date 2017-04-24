@@ -101,12 +101,6 @@ always@(*) begin
 			savePC_o=0;
 			RegDst_o = 0;
 			Branch_o = 0;
-			BranchSel = 0;
-			SE = 1;
-			Jump_o = 0;
-			  = 0;
-			  = 0;
-			  = 0;
 		end		
 	endcase
 end

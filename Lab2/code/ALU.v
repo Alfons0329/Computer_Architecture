@@ -37,8 +37,8 @@ begin
 	4'd1:result_o = src1_i-src2_i;//sub
 	4'd2:result_o = src1_i&src2_i;//and
 	4'd3:result_o = src1_i|src2_i;//or
-	4'd4:result_o = src1_i<src2_i?1:0;
-	4'd5:
+	4'd4:result_o = src1_i<src2_i?1:0;//slt
+	4'd5://sltu
 	begin
 		if(src1_i<0)
 			src1_i=-src1_i;
@@ -47,9 +47,9 @@ begin
 		
 		result_o = src1_i<src2_i?1:0;
 	end
-	4'd6:result_o = src1_i<<src2_i;
-	4'd7:result_o = src2_i<<16;
-	4'd8:result_o = src1_i|src2_i;
+	//4'd6:result_o = src1_i<<src2_i;//sll(sllv)
+	//	4'd7:result_o = src2_i<<16;//lui
+	4'd8:result_o = src1_i|src2_i;//ori
 	default:result_o = 0;
 	endcase
 end
