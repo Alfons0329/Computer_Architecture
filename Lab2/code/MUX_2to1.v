@@ -16,7 +16,7 @@ module MUX_2to1(
                data_o
                );
 
-parameter size = 0;			   
+parameter size = 2;			   
 			
 //I/O ports               
 input   [size-1:0] data0_i;          
@@ -28,6 +28,12 @@ output  [size-1:0] data_o;
 reg     [size-1:0] data_o;
 
 //Main function
+always@(*) begin
+	case(select_i)
+		1'b0: data_o = data0_i;
+		1'b1: data_o = data1_i;
+	endcase
+end
 
 endmodule      
           

@@ -38,9 +38,9 @@ localparam
  
        
 //Select exact operation
-always@(posedge clk)
+always@(*)
 begin
-	case(aluop_i)
+	case(ALUOp_i)
 	3'b000:ALUCtrl_o=alu_add;//however the addi version
 	3'b001:ALUCtrl_o=alu_sub;//however the beq version
 	3'b010:

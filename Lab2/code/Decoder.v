@@ -33,7 +33,7 @@ reg            ALUSrc_o;
 reg            RegWrite_o;
 reg            RegDst_o;
 reg            Branch_o;
-
+reg				savePC_o;
 //Parameter
 
 
