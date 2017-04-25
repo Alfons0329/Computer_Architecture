@@ -18,8 +18,8 @@ module ALU(
 	);
      
 //I/O ports
-input  [32-1:0]  src1_i;
-input  [32-1:0]	 src2_i;
+input signed [32-1:0]  src1_i;
+input signed [32-1:0]	 src2_i;
 input  [4-1:0]   ctrl_i;
 
 output [32-1:0]	 result_o;
@@ -44,14 +44,20 @@ begin
 	begin
 		if(src1_i<0)
 			src1_tmp=-src1_i;
-		else if(src2_i<0)
+		else
+			src1_tmp=src1_i;
+		if(src2_i<0)
 			src2_tmp=-src2_i;
-		
+		else
+			src2_tmp=src2_i;
+			
 		result_o = src1_tmp<src2_tmp?1:0;
 	end
 	4'd6:result_o = src1_i<<src2_i;//sll(sllv)
 	4'd7:result_o = src2_i<<16;//lui
 	4'd8:result_o = src1_i|src2_i;//ori
+	4'd9:result_o = src1_i-src2_i;
+	4'd10:result_o = src1_i-src2_i;
 	default:result_o = 0;
 	endcase
 end
