@@ -36,7 +36,7 @@ begin
 	case(ctrl_i) //4'd0~
 	4'd0:result_o = src1_i+src2_i;//add
 	4'd1:result_o = src1_i-src2_i;//sub
-	4'd2:result_o = src1_i&src2_i;//and
+	4'd2:result_o = src1_i&src2_i;//and	
 	4'd3:result_o = src1_i|src2_i;//or
 	4'd4:result_o = src1_i<src2_i?1:0;//slt
 	4'd5://sltu
