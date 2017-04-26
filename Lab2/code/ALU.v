@@ -56,8 +56,8 @@ begin
 	4'd6:result_o = src1_i<<src2_i;//sll(sllv)
 	4'd7:result_o = src2_i<<16;//lui
 	4'd8:result_o = src1_i|src2_i;//ori
-	4'd9:result_o = src1_i-src2_i;
-	4'd10:result_o = src1_i-src2_i;
+	4'd9:result_o = src1_i-src2_i;//beq
+	4'd10:result_o = (src1_i-src2_i==0)?0:1;//bne
 	default:result_o = 0;
 	endcase
 end
