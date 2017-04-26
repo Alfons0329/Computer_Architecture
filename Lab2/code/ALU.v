@@ -14,14 +14,15 @@ module ALU(
 	src2_i,//rt
 	ctrl_i,
 	result_o,
-	zero_o
+	zero_o,
+	shamt
 	);
      
 //I/O ports
 input  [32-1:0]  src1_i;
 input  [32-1:0]	 src2_i;
 input  [4-1:0]   ctrl_i;
-
+input  [5-1:0] shamt;
 output [32-1:0]	 result_o;
 output           zero_o;
 
@@ -40,18 +41,19 @@ end
 //Main function
 always@(*) 
 begin
-	case(ctrl_i) //4'd0~
+	case(ctrl_i) //4'd0~ SEE ALU CONTROLLER FOR INSTRUCTION ENCODING/DECODING INFO.
 	4'd0:result_o = src1_i+src2_i;//add
 	4'd1:result_o = src1_i-src2_i;//sub
 	4'd2:result_o = src1_i&src2_i;//and	
 	4'd3:result_o = src1_i|src2_i;//or
 	4'd4:result_o = src1_i<src2_i?1:0;//slt
 	4'd5:result_o = src1_i<src2_i?1:0;//sltu
-	4'd6:result_o = src1_i<<src2_i;//sll(sllv)
-	4'd7:result_o = 10*(src2_i<<16);//lui
+	4'd6:result_o = src2_i<<shamt;//sll
+	4'd7:result_o = src2_i*(65536);//lui
 	4'd8:result_o = src1_i|src2_i;//ori
 	4'd9:result_o = src1_i-src2_i;//beq
 	4'd10:result_o = src1_i-src2_i;//bne
+	4'd11:result_o = src2_i<<src1_i;//sllv
 	default:result_o = 0;
 	endcase
 end

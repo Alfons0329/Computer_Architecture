@@ -36,7 +36,8 @@ localparam
 	alu_lui=4'd7,
 	alu_ori=4'd8,
 	alu_beq=4'd9,
-	alu_bne=4'd10;
+	alu_bne=4'd10,
+	alu_sllv=4'd11;
  
        
 //Select exact operation
@@ -48,6 +49,8 @@ begin
 	3'b010:
 	begin
 	    case(funct_i)
+		6'h0:ALUCtrl_o=alu_sll;
+		6'h4:ALUCtrl_o=alu_sllv;
 		6'h20:ALUCtrl_o=alu_add;
 		6'h22:ALUCtrl_o=alu_sub;
 		6'h24:ALUCtrl_o=alu_and;

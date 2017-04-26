@@ -128,7 +128,8 @@ ALU ALU(
 	    .src2_i(mux2_alu),
 	    .ctrl_i(aluctrl_alu),
 	    .result_o(alu_wd),
-		.zero_o(zero_and)
+		 .zero_o(zero_and),
+		 .shamt(instruction[10:6])
 	    );
 		
 Adder Adder2(
