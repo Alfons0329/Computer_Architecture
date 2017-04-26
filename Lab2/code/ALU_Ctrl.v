@@ -34,8 +34,8 @@ localparam
 	alu_sltu=4'd5,
 	alu_sll=4'd6,
 	alu_lui=4'd7,
-	alu_ori=4'd8
-	alu_beq=4'd9
+	alu_ori=4'd8,
+	alu_beq=4'd9,
 	alu_bne=4'd10;
  
        
@@ -44,7 +44,7 @@ always@(*)
 begin
 	case(ALUOp_i)
 	3'b000:begin ALUCtrl_o=alu_add; end//however the addi version
-	3'b001:begin ALUCtrl_o=beq; end//however the beq version
+	3'b001:begin ALUCtrl_o=alu_beq; end//however the beq version
 	3'b010:
 	begin
 	    case(funct_i)
