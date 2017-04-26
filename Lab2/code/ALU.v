@@ -28,8 +28,14 @@ output           zero_o;
 //Internal signals
 reg    [32-1:0]  result_o;
 reg 	 [32-1:0]  src1_tmp,src2_tmp;
-wire             zero_o;
-assign zero_o = (result_o == 0) ? 1 : 0 ;
+reg             zero_o;
+always@(*) 
+begin
+	if(ctrl_i==4'd9)//beq condition
+		zero_o = (result_o == 0) ? 1 : 0 ;
+	else if(ctrl_i==4'd10)
+		zero_o = (result_o == 0) ? 0 : 1 ;
+end
 //Parameter
 //Main function
 always@(*) 
@@ -57,7 +63,7 @@ begin
 	4'd7:result_o = src2_i<<16;//lui
 	4'd8:result_o = src1_i|src2_i;//ori
 	4'd9:result_o = src1_i-src2_i;//beq
-	4'd10:result_o = (src1_i-src2_i==0)?0:1;//bne
+	4'd10:result_o = src1_i-src2_i;//bne
 	default:result_o = 0;
 	endcase
 end
