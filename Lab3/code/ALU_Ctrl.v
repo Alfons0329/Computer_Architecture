@@ -65,6 +65,7 @@ begin
 		6'h25:ALUCtrl_o=alu_or;
 		6'h2a:ALUCtrl_o=alu_slt;
 		6'h2b:ALUCtrl_o=alu_sltu;
+        6'h18:ALUCtrl_o=alu_mul;
 		endcase
 	end
 	5'b011:begin ALUCtrl_o=alu_bne; end//however the beq version

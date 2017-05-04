@@ -40,6 +40,13 @@ begin
 			zero_o = (result_o == 0) ? 1 : 0 ;
 		else if(ctrl_i==4'd10)//bne
 			zero_o = (result_o == 0) ? 0 : 1 ;
+//2017/5/4
+        else if(crtl_i==15) //BLE
+            zero_o = (src1_i<=src2_i) ? 1 : 0 ;
+        else if(crtl_i==16) //BLE
+            zero_o = (src1_i<src2_i) ? 1 : 0 ;
+        else if(crtl_i==15) //BLE
+            zero_o = (src1_i!=0) ? 1 : 0 ;
 		else
 			zero_o = 0;
 	end
@@ -65,6 +72,10 @@ begin
 		4'd9:result_o = src1_i-src2_i;//beq
 		4'd10:result_o = src1_i-src2_i;//bne
 		4'd11:result_o = src2_i<<src1_i;//sllv
+//2017/5/4
+        12:result_o = src1_i+src2_i; //lw
+        13:result_o = src1_i+src2_i; //sw
+        14:result_o = src1_i*src2_i; //mul
 		default:result_o = 0;
 		endcase
 	end
