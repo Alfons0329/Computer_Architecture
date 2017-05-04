@@ -2,11 +2,11 @@
 //--------------------------------------------------------------------------------
 //Version:     1
 //--------------------------------------------------------------------------------
-//Writer:      
+//Writer:
 //----------------------------------------------
-//Date:        
+//Date:
 //----------------------------------------------
-//Description: 
+//Description:
 //--------------------------------------------------------------------------------
 
 module ALU(
@@ -18,7 +18,7 @@ module ALU(
 	shamt,
 	rst_n
 	);
-     
+
 //I/O ports
 input  [32-1:0]  src1_i;
 input  [32-1:0]	 src2_i;
@@ -32,13 +32,13 @@ output           zero_o;
 reg    [32-1:0]  result_o;
 reg 	 [32-1:0]  src1_tmp,src2_tmp;
 reg             zero_o;
-always@(*) 
+always@(*)
 begin
 	if(rst_n)
 	begin
 		if(ctrl_i==4'd9)//beq condition
 			zero_o = (result_o == 0) ? 1 : 0 ;
-		else if(ctrl_i==4'd10)
+		else if(ctrl_i==4'd10)//bne
 			zero_o = (result_o == 0) ? 0 : 1 ;
 		else
 			zero_o = 0;
@@ -48,14 +48,14 @@ begin
 end
 //Parameter
 //Main function
-always@(*) 
+always@(*)
 begin
 	if(rst_n)
 	begin
 		case(ctrl_i) //4'd0~ SEE ALU CONTROLLER FOR INSTRUCTION ENCODING/DECODING INFO.
 		4'd0:result_o = src1_i+src2_i;//add
 		4'd1:result_o = src1_i-src2_i;//sub
-		4'd2:result_o = src1_i&src2_i;//and	
+		4'd2:result_o = src1_i&src2_i;//and
 		4'd3:result_o = src1_i|src2_i;//or
 		4'd4:result_o = src1_i<src2_i?1:0;//slt
 		4'd5:result_o = src1_i<src2_i?1:0;//sltu
@@ -70,7 +70,7 @@ begin
 	end
 	else
 		result_o=0;
-	
+
 end
 
 endmodule
