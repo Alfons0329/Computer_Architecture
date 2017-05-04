@@ -184,8 +184,7 @@ always@(*) begin
             ALUSrc_o = 0; //signextimm value
             RegWrite_o = 1;
             savePC_o = 0;
-            RegDst_o = 2; //shoud fix this to save PC+8;
-            //we use 2 to salect PC+8 and save it
+            RegDst_o = 2;
             Branch_o = 0;
             BranchType_o = 0;
             Jump_o = 1; //YES We jump
@@ -199,8 +198,7 @@ always@(*) begin
             ALUSrc_o = 0; //signextimm value
             RegWrite_o = 0;
             savePC_o = 0;
-            RegDst_o = 0; //shoud fix this to save PC+8;
-            //we use 2 to salect PC+8 and save it
+            RegDst_o = 0;
             Branch_o = 1;
             BranchType_o = 3;
             Jump_o = 0; //YES We jump
@@ -208,9 +206,48 @@ always@(*) begin
             MemWrite_o = 0;
             MemtoReg_o = 0;//data from mem to reg
         end
-
-
-
+        6'h6://BLT Branch less than
+        begin
+            ALU_op_o = 11;
+            ALUSrc_o = 0; //signextimm value
+            RegWrite_o = 0;
+            savePC_o = 0;
+            RegDst_o = 0;
+            Branch_o = 1;
+            BranchType_o = 3;
+            Jump_o = 0; //YES We jump
+            MemRead_o = 0; //read data from memory
+            MemWrite_o = 0;
+            MemtoReg_o = 0;//data from mem to reg
+        end
+        6'h5://BNEZ Branch non equal zero
+        begin
+            ALU_op_o = 12;
+            ALUSrc_o = 0; //signextimm value
+            RegWrite_o = 0;
+            savePC_o = 0;
+            RegDst_o = 0;
+            Branch_o = 1;
+            BranchType_o = 3;
+            Jump_o = 0; //YES We jump
+            MemRead_o = 0; //read data from memory
+            MemWrite_o = 0;
+            MemtoReg_o = 0;//data from mem to reg
+        end
+        6'hf:
+        begin
+            ALU_op_o = 13;
+            ALUSrc_o = 0; //signextimm value
+            RegWrite_o = 1;
+            savePC_o = 0;
+            RegDst_o = 0; //i type RegDst_o=0;
+            Branch_o = 0;
+            BranchType_o = 0;
+            Jump_o = 0; //YES We jump
+            MemRead_o = 0; //read data from memory
+            MemWrite_o = 0;
+            MemtoReg_o = 0;//data from mem to reg
+        end
 	endcase
 end
 
