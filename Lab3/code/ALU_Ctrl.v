@@ -13,12 +13,12 @@ module ALU_Ctrl(
           funct_i,
           ALUOp_i,
           ALUCtrl_o,
-          jr,
+          jr
           );
 
 //I/O ports
 input      [6-1:0] funct_i;
-input      [3-1:0] ALUOp_i;
+input      [5-1:0] ALUOp_i;
 
 output     [5-1:0] ALUCtrl_o;
 output reg  jr;

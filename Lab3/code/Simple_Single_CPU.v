@@ -32,7 +32,7 @@ wire [31:0] se_o;
 //////////////////////////////
 wire [31:0] mux2_alu;
 //////////////////////////////
-wire [3:0] aluctrl_alu;
+wire [4:0] aluctrl_alu;
 //////////////////////////////
 wire [31:0] sl2_add2;
 //////////////////////////////
@@ -79,9 +79,9 @@ wire [31:0] Data_Memory_o;
 wire [31:0] Mux_Write_Back_Select_o;
 /////////////////////////////Mux_Wtire_Back_Select END///////////////////////
 //Greate componentes
-MUX_2to1 PC_Source(
+MUX_2to1 #(.size(32))PC_Source(
     .data0_i(Mux_Jump_o),
-    .data1_i(instruction[25:21]),
+    .data1_i(rd1_alu),
     .select_i(jr),
     .data_o(Mux_PC_Source_o)
     );
@@ -99,7 +99,7 @@ Adder Adder1(
 	    ); // This is PC adder
 
 Instr_Memory IM(
-        .pc_addr_i(pc_im),
+        .addr_i(pc_im),
 	    .instr_o(instruction)
 	    );
 Shift_Left_Two_26 Shifter26(
@@ -114,13 +114,13 @@ Jump_cat Concatenator(
 MUX_4to1 #(.size(5)) Mux_Write_Reg_Select(
         .data0_i(instruction[20:16]),
         .data1_i(instruction[15:11]),
-        .data2_i(31),
-        .data3_i(0),//For future use
-        .select_i(RegDst_o),
+        .data2_i(5'd31),
+        .data3_i(5'd0),//For future use
+        .select_i(regdst),
         .data_o(WriteReg)
         	);
 MUX_2to1 Mux_Write_Data_Select(
-    .data0_i(Mux_Wtire_Back_Select_o),
+    .data0_i(Mux_Write_Back_Select_o),
     .data1_i(add1_o),
     .select_i(jal),
     .data_o(Mux_Write_Data_Select_o)
@@ -180,7 +180,7 @@ ALU ALU(
 		.shamt(instruction[10:6]),
 		.rst_n(rst_i)
 	    );
-Data_Memory DM(
+Data_Memory Data_Memory(
     .clk_i(clk_i),
     .addr_i(alu_result_o),
     .data_i(rd2_mux2),
@@ -208,13 +208,14 @@ MUX_2to1 #(.size(32)) Mux_Branch(
 MUX_2to1 #(.size(32)) Mux_Jump(
         .data0_i(concat_o),
         .data1_i(Mux_Branch_o),
-        .select_i(jump),
+        .select_i(~jump),
         .data_o(Mux_Jump_o)
         );
 MUX_4to1 Mux_Write_Back_Select(
         .data0_i(alu_result_o),
         .data1_i(Data_Memory_o),
         .data2_i(se_o),
+		.data3_i(32'd0),
         .select_i(memtoreg),
         .data_o(Mux_Write_Back_Select_o)
     );

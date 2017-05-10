@@ -44,10 +44,10 @@ output         reg [2-1:0] MemtoReg_o;
 //
 output         reg jal;
 //Internal Signals
-reg    [3-1:0] ALU_op_o;
+reg    [5-1:0] ALU_op_o;
 reg            ALUSrc_o;
 reg            RegWrite_o;
-reg            RegDst_o;
+reg    [2-1:0] RegDst_o;
 reg            Branch_o;
 reg				savePC_o;
 //Parameter
