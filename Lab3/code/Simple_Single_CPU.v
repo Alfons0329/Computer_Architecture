@@ -39,7 +39,7 @@ wire [31:0] sl2_add2;
 
 wire [31:0] add2_mux3;
 //////////////////////////////
-wire [31:0] mux3_pc;
+wire [31:0] Mux_Branch_o;
 //////////////////////////////
 wire [31:0] alu_wd;
 wire zero_and;
@@ -47,22 +47,36 @@ wire zero_and;
 wire and_mux3;
 //////////////////////////////
 /////////////////////////////DECODER/////////////////////////////////////////
-wire [2:0] alu_op;
-wire alu_src,branch,regwrite,regdst;
-
+wire [4:0] alu_op;
+wire [2:0] branchtype;
+wire [1:0] regdst,memtoreg;
+wire alu_src,branch,regwrite,jump,memread,memwrite;
 /////////////////////////////DECODER END/////////////////////////////////////
+/////////////////////////////CONCATENATOR////////////////////////////////////
+wire [31:0] concat_o;
+/////////////////////////////CONCATENATOR END////////////////////////////////
+/////////////////////////////MUX PC_Source///////////////////////////////////
+wire [31:0] Mux_PC_Source_o;
+/////////////////////////////MUX PC_Source END///////////////////////////////////
+/////////////////////////////MUX Jump////////////////////////////////////////
+wire [31:0] Mux_Jump_o;
+/////////////////////////////Mux_Jump END////////////////////////////////////
 
-
-
-
-
-
+/////////////////////////////Mux_Branch//////////////////////////////////////
+wire [31:0] Mux_Branch_o;
+/////////////////////////////Mux_Branch END//////////////////////////////////
 
 //Greate componentes
+MUX_2to1 PC_Source(
+    .data0_i(Mux_Jump_o),
+    .data1_i(instruction[25:21]),
+    .select_i(jr),
+    .data_o(Mux_PC_Source_o)
+    );
 ProgramCounter PC(
         .clk_i(clk_i),
 	    .rst_i (rst_i),
-	    .pc_in_i(mux3_pc) ,
+	    .pc_in_i(Mux_PC_Source_o) ,
 	    .pc_out_o(pc_im)
 	    );
 
@@ -76,8 +90,8 @@ Instr_Memory IM(
         .pc_addr_i(pc_im),
 	    .instr_o(instruction)
 	    );
-
-MUX_2to1 #(.size(5)) Mux_Write_Reg(
+//FIX THIS ONE
+MUX_4to1 #(.size(5)) Mux_Write_Reg(
         .data0_i(instruction[20:16]),
         .data1_i(instruction[15:11]),
         .select_i(regdst),
@@ -144,11 +158,17 @@ Shift_Left_Two_32 Shifter(
         .data_o(sl2_add2)
         );
 
-MUX_2to1 #(.size(32)) Mux_PC_Source(
+MUX_2to1 #(.size(32)) Mux_Branch(
         .data0_i(add1_add2),
         .data1_i(add2_mux3),
         .select_i(branch&zero_and),
-        .data_o(mux3_pc)
+        .data_o(Mux_Branch_o)
+        );
+MUX_2to1 #(.size(32)) Mux_Jump(
+        .data0_i(Concat_o),
+        .data1_i(Mux_Branch_o),
+        .select_i(jump),
+        .data_o(Mux_Jump_o)
         );
 
 endmodule

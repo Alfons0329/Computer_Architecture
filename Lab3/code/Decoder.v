@@ -20,7 +20,8 @@ module Decoder(
     Jump_o,
     MemRead_o,
     MemWrite_o,
-    MemtoReg_o
+    MemtoReg_o,
+    jal
 	);
 
 //I/O ports
@@ -39,6 +40,9 @@ output         MemRead_o;
 output         MemWrite_o;
 output [2-1:0] MemtoReg_o;
 //from ALUresult 0, from memory 1 from immidiate value 2
+
+//
+output         jr,jal;
 //Internal Signals
 reg    [3-1:0] ALU_op_o;
 reg            ALUSrc_o;
@@ -58,7 +62,7 @@ always@(*) begin
 			ALUSrc_o = 0;
 			RegWrite_o = 1;
 			savePC_o = 0;
-			RegDst_o = 1;
+    			RegDst_o = 1;
 			Branch_o = 0;
             BranchType_o = 0;
             Jump_o = 0;
@@ -214,7 +218,7 @@ always@(*) begin
             savePC_o = 0;
             RegDst_o = 0;
             Branch_o = 1;
-            BranchType_o = 3;
+            BranchType_o = 4;
             Jump_o = 0; //YES We jump
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
@@ -228,7 +232,7 @@ always@(*) begin
             savePC_o = 0;
             RegDst_o = 0;
             Branch_o = 1;
-            BranchType_o = 3;
+            BranchType_o = 5;
             Jump_o = 0; //YES We jump
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
