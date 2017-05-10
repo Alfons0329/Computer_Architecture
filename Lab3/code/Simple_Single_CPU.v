@@ -28,7 +28,7 @@ wire [4:0] WriteReg;
 /////////Mux_Write_Reg_Select END////
 wire [31:0]rd1_alu,rd2_mux2;
 //////////////////////////////
-wire [31:0] se_out;
+wire [31:0] se_o;
 //////////////////////////////
 wire [31:0] mux2_alu;
 //////////////////////////////
@@ -41,7 +41,7 @@ wire [31:0] add2_mux3;
 //////////////////////////////
 wire [31:0] Mux_Branch_o;
 //////////////////////////////
-wire [31:0] alu_wd;
+wire [31:0] alu_result_o;
 wire zero_and;
 //////////////////////////////
 wire and_mux3;
@@ -72,6 +72,13 @@ wire [27:0] Shift_Left_Two_26_o;
 /////////////////////////////Mux_Write_Data_Select///////////////////////////
 wire [31:0] Mux_Write_Data_Select_o;
 /////////////////////////////Mux_Write_Data_Select END///////////////////////
+/////////////////////////////Data_Memory/////////////////////////////////////
+wire [31:0] Data_Memory_o;
+/////////////////////////////Data_Memory END/////////////////////////////////
+
+/////////////////////////////Mux_Wtire_Back_Select///////////////////////////
+wire [31:0] Mux_Write_Data_Select_o;
+/////////////////////////////Mux_Wtire_Back_Select END///////////////////////
 //Greate componentes
 MUX_2to1 PC_Source(
     .data0_i(Mux_Jump_o),
@@ -114,7 +121,7 @@ MUX_4to1 #(.size(5)) Mux_Write_Reg_Select(
         .data_o(WriteReg)
         	);
 MUX_2to1 Mux_Write_Data_Select(
-    .data0_i(Mux_DataMemory_o),
+    .data0_i(Mux_Wtire_Back_Select_o),
     .data1_i(add1_o),
     .select_i(jal),
     .data_o(Mux_Write_Data_Select_o),
@@ -125,7 +132,7 @@ Reg_File RF(
         .RSaddr_i(instruction[25:21]) ,
         .RTaddr_i(instruction[20:16]) ,
         .RDaddr_i(WriteReg) ,
-        .RDdata_i(alu_wd)  ,
+        .RDdata_i(Mux_Write_Data_Select_o)  ,
         .RegWrite_i (regwrite),
         .RSdata_o(rd1_alu) ,
         .RTdata_o(rd2_mux2)
@@ -155,12 +162,12 @@ ALU_Ctrl AC(
 
 Sign_Extend SE(
         .data_i(instruction[15:0]),
-        .data_o(se_out)
+        .data_o(se_o)
         );
 
 MUX_2to1 #(.size(32)) Mux_ALUSrc(
         .data0_i(rd2_mux2),
-        .data1_i(se_out),
+        .data1_i(se_o),
         .select_i(alu_src),
         .data_o(mux2_alu)
         );
@@ -169,12 +176,19 @@ ALU ALU(
         .src1_i(rd1_alu),
 	    .src2_i(mux2_alu),
 	    .ctrl_i(aluctrl_alu),
-	    .result_o(alu_wd),
+	    .result_o(alu_result_o),
 		.zero_o(zero_and),
 		.shamt(instruction[10:6]),
 		.rst_n(rst_i)
 	    );
-
+Data_Memory DM(
+    .clk_i(clk_i),
+    .addr_i(alu_result_o),    .
+    .data_i(rd2_mux2),
+    .MemRead_i(memread),
+    .MemWrite_i(memwrite),
+    .data_o(Data_Memory_o)
+    );
 Adder Adder2(
         .src1_i(add1_o),
 	    .src2_i(sl2_add2),
@@ -182,7 +196,7 @@ Adder Adder2(
 	    ); //adder for branch
 
 Shift_Left_Two_32 Shifter(
-        .data_i(se_out),
+        .data_i(se_o),
         .data_o(sl2_add2)
         );
 
@@ -198,5 +212,11 @@ MUX_2to1 #(.size(32)) Mux_Jump(
         .select_i(jump),
         .data_o(Mux_Jump_o)
         );
-
+MUX_4to1 Mux_Write_Back_Select(
+        .data0_i(alu_result_o),
+        .data1_i(Data_Memory_o),
+        .data2_i(se_o),
+        .select_i(memtoreg),
+        .data_o(Mux_Write_Back_Select_o)
+    );
 endmodule
