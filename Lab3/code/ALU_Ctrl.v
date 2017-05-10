@@ -50,7 +50,7 @@ localparam
 
 always@(*)
 begin
-    if(ALUOp_i==5'b010&&funct_i==6'h8)
+    if(ALUOp_i==5'b00010&&funct_i==6'h8)
     begin
         jr=1;
     end

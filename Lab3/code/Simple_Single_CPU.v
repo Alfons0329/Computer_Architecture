@@ -24,7 +24,7 @@ wire [31:0] pc_im;
 wire [31:0] add1_o;
 /////////////////////////////
 /////////Mux_Write_Reg_Select/////////
-wire [4:0] WriteReg;
+wire [4:0] Mux_Write_Reg_Select_o;
 /////////Mux_Write_Reg_Select END////
 wire [31:0]rd1_alu,rd2_mux2;
 //////////////////////////////
@@ -117,7 +117,7 @@ MUX_4to1 #(.size(5)) Mux_Write_Reg_Select(
         .data2_i(5'd31),
         .data3_i(5'd0),//For future use
         .select_i(regdst),
-        .data_o(WriteReg)
+        .data_o(Mux_Write_Reg_Select_o)
         	);
 MUX_2to1 Mux_Write_Data_Select(
     .data0_i(Mux_Write_Back_Select_o),
@@ -130,7 +130,7 @@ Reg_File RF(
 	    .rst_i(rst_i) ,
         .RSaddr_i(instruction[25:21]) ,
         .RTaddr_i(instruction[20:16]) ,
-        .RDaddr_i(WriteReg) ,
+        .RDaddr_i(Mux_Write_Reg_Select_o) ,
         .RDdata_i(Mux_Write_Data_Select_o)  ,
         .RegWrite_i (regwrite),
         .RSdata_o(rd1_alu) ,
@@ -208,7 +208,7 @@ MUX_2to1 #(.size(32)) Mux_Branch(
 MUX_2to1 #(.size(32)) Mux_Jump(
         .data0_i(concat_o),
         .data1_i(Mux_Branch_o),
-        .select_i(~jump),
+        .select_i(~jump),//fix wrong bit
         .data_o(Mux_Jump_o)
         );
 MUX_4to1 Mux_Write_Back_Select(
