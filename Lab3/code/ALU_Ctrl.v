@@ -12,7 +12,8 @@
 module ALU_Ctrl(
           funct_i,
           ALUOp_i,
-          ALUCtrl_o
+          ALUCtrl_o,
+          jr,
           );
 
 //I/O ports
@@ -20,7 +21,7 @@ input      [6-1:0] funct_i;
 input      [3-1:0] ALUOp_i;
 
 output     [5-1:0] ALUCtrl_o;
-
+output     jr;
 //Internal Signals
 reg        [5-1:0] ALUCtrl_o;
 
@@ -47,7 +48,15 @@ localparam
     alu_bnez=17
     ;
 
-
+always@(*)
+begin
+    if(ALUOp_i=5'b010&&funct_i=6'h8)
+    begin
+        jr=1;
+    end
+    else
+        jr=0;
+end
 //Select exact operation
 always@(*)
 begin

@@ -62,13 +62,14 @@ always@(*) begin
 			ALUSrc_o = 0;
 			RegWrite_o = 1;
 			savePC_o = 0;
-    			RegDst_o = 1;
+    		RegDst_o = 1;
 			Branch_o = 0;
             BranchType_o = 0;
             Jump_o = 0;
             MemRead_o = 0;
             MemWrite_o = 0;
             MemtoReg_o = 0;
+            jal = 0;
 		end
 		6'h8:
 		begin //ADDI
@@ -83,6 +84,7 @@ always@(*) begin
             MemRead_o = 0;
             MemWrite_o = 0;
             MemtoReg_o = 0;
+            jal = 0;
 		end
 		6'h4:
 		begin //BEQ
@@ -97,6 +99,7 @@ always@(*) begin
             MemRead_o = 0;
             MemWrite_o = 0;
             MemtoReg_o = 0;
+            jal = 0;
 		end
 		6'h5:
 		begin //BNE;
@@ -111,6 +114,7 @@ always@(*) begin
             MemRead_o = 0;
             MemWrite_o = 0;
             MemtoReg_o = 0;
+            jal = 0;
 		end
 		6'hd:
 		begin //ORI
@@ -125,6 +129,7 @@ always@(*) begin
             MemRead_o = 0;
             MemWrite_o = 0;
             MemtoReg_o = 0;
+            jal = 0;
 		end
 		6'hf:
 		begin //LUI
@@ -139,6 +144,7 @@ always@(*) begin
             MemRead_o = 0;
             MemWrite_o = 0;
             MemtoReg_o = 0;
+            jal = 0;
 		end
         6'h23://lw
         begin
@@ -153,6 +159,7 @@ always@(*) begin
             MemRead_o = 1; //read data from memory
             MemWrite_o = 0;
             MemtoReg_o = 1;//data from mem to reg
+            jal = 0;
         end
         6'h2b://sw
         begin
@@ -167,6 +174,7 @@ always@(*) begin
             MemRead_o = 0; //read data from memory
             MemWrite_o = 1;
             MemtoReg_o = 0;//data from mem to reg
+            jal = 0;
         end
         6'h2://jump
         begin
@@ -181,6 +189,7 @@ always@(*) begin
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
             MemtoReg_o = 0;//data from mem to reg
+            jal = 0;
         end
         6'h3://jump and link
         begin
@@ -195,6 +204,7 @@ always@(*) begin
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
             MemtoReg_o = 0;//data from mem to reg
+            jal = 1;
         end
         6'h7://BLE Branch less equal
         begin
@@ -209,6 +219,7 @@ always@(*) begin
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
             MemtoReg_o = 0;//data from mem to reg
+            jal = 0;
         end
         6'h6://BLT Branch less than
         begin
@@ -223,6 +234,7 @@ always@(*) begin
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
             MemtoReg_o = 0;//data from mem to reg
+            jal = 0;
         end
         6'h5://BNEZ Branch non equal zero
         begin
@@ -237,6 +249,7 @@ always@(*) begin
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
             MemtoReg_o = 0;//data from mem to reg
+            jal = 0;
         end
         6'hf:
         begin
@@ -251,6 +264,7 @@ always@(*) begin
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
             MemtoReg_o = 0;//data from mem to reg
+            jal = 0;
         end
 	endcase
 end

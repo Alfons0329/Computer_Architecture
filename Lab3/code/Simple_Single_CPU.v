@@ -21,11 +21,11 @@ wire [31:0]instruction;
 //Internal Signles
 wire [31:0] pc_im;
 /////////////////////////////
-wire [31:0] add1_add2;
+wire [31:0] add1_o;
 /////////////////////////////
-//////////////////////////////
-wire [4:0] mux1_wr1;
-//////////////////////////////
+/////////Mux_Write_Reg_Select/////////
+wire [4:0] WriteReg;
+/////////Mux_Write_Reg_Select END////
 wire [31:0]rd1_alu,rd2_mux2;
 //////////////////////////////
 wire [31:0] se_out;
@@ -50,7 +50,7 @@ wire and_mux3;
 wire [4:0] alu_op;
 wire [2:0] branchtype;
 wire [1:0] regdst,memtoreg;
-wire alu_src,branch,regwrite,jump,memread,memwrite;
+wire alu_src,branch,regwrite,jump,memread,memwrite,jal;
 /////////////////////////////DECODER END/////////////////////////////////////
 /////////////////////////////CONCATENATOR////////////////////////////////////
 wire [31:0] concat_o;
@@ -65,7 +65,13 @@ wire [31:0] Mux_Jump_o;
 /////////////////////////////Mux_Branch//////////////////////////////////////
 wire [31:0] Mux_Branch_o;
 /////////////////////////////Mux_Branch END//////////////////////////////////
+/////////////////////////////Shift_Left_Two_26///////////////////////////////
+wire [27:0] Shift_Left_Two_26_o;
+/////////////////////////////Shift_Left_Two_26 END///////////////////////////
 
+/////////////////////////////Mux_Write_Data_Select///////////////////////////
+wire [31:0] Mux_Write_Data_Select_o;
+/////////////////////////////Mux_Write_Data_Select END///////////////////////
 //Greate componentes
 MUX_2to1 PC_Source(
     .data0_i(Mux_Jump_o),
@@ -83,27 +89,42 @@ ProgramCounter PC(
 Adder Adder1(
         .src1_i(32'd4),
 	    .src2_i(pc_im),
-	    .sum_o(add1_add2)
+	    .sum_o(add1_o)
 	    ); // This is PC adder
 
 Instr_Memory IM(
         .pc_addr_i(pc_im),
 	    .instr_o(instruction)
 	    );
-//FIX THIS ONE
-MUX_4to1 #(.size(5)) Mux_Write_Reg(
-        .data0_i(instruction[20:16]),
-        .data1_i(instruction[15:11]),
-        .select_i(regdst),
-        .data_o(mux1_wr1)
-        );
-
+Shift_Left_Two_26 Shifter(
+    .data_i(instruction[25:0]),
+    .data_o(Shift_Left_Two_26_o)
+    );
+Jump_cat Concatenator(
+    .pc_in_i(add1_o),
+    .jump_addr_i(Shift_Left_Two_26_o),
+    .pc_out_o(concat_o)
+    );
+MUX_4to1 #(.size(5)) Mux_Write_Reg_Select(
+        .data0_i(instruction_o[20:16]),
+        .data1_i(instruction_o[15:11]),
+        .data2_i(31),
+        .data3_i(0),//For future use
+        .select_i(RegDst_o),
+        .data_o(WriteReg)
+        	);
+MUX_2to1 Mux_Write_Data_Select(
+    .data0_i(Mux_DataMemory_o),
+    .data1_i(add1_o),
+    .select_i(jal),
+    .data_o(Mux_Write_Data_Select_o),
+    );
 Reg_File RF(
         .clk_i(clk_i),
 	    .rst_i(rst_i) ,
         .RSaddr_i(instruction[25:21]) ,
         .RTaddr_i(instruction[20:16]) ,
-        .RDaddr_i(mux1_wr1) ,
+        .RDaddr_i(WriteReg) ,
         .RDdata_i(alu_wd)  ,
         .RegWrite_i (regwrite),
         .RSdata_o(rd1_alu) ,
@@ -116,13 +137,20 @@ Decoder Decoder(
 	    .ALU_op_o(alu_op),
 	    .ALUSrc_o(alu_src),
 	    .RegDst_o(regdst),
-		.Branch_o(branch)
+		.Branch_o(branch),
+        .BranchType_o(branchtype),
+        .Jump_o(jump),
+        .MemRead_o(memread),
+        .MemWrite_o(memwrite),
+        .MemtoReg_o(memtoreg),
+        .jal(jal)
 	    );
 
 ALU_Ctrl AC(
         .funct_i(instruction[5:0]),
         .ALUOp_i(alu_op),
-        .ALUCtrl_o(aluctrl_alu)
+        .ALUCtrl_o(aluctrl_alu),
+        .jr(jr)
         );
 
 Sign_Extend SE(
@@ -148,7 +176,7 @@ ALU ALU(
 	    );
 
 Adder Adder2(
-        .src1_i(add1_add2),
+        .src1_i(add1_o),
 	    .src2_i(sl2_add2),
 	    .sum_o(add2_mux3)
 	    ); //adder for branch
@@ -159,13 +187,13 @@ Shift_Left_Two_32 Shifter(
         );
 
 MUX_2to1 #(.size(32)) Mux_Branch(
-        .data0_i(add1_add2),
+        .data0_i(add1_o),
         .data1_i(add2_mux3),
         .select_i(branch&zero_and),
         .data_o(Mux_Branch_o)
         );
 MUX_2to1 #(.size(32)) Mux_Jump(
-        .data0_i(Concat_o),
+        .data0_i(concat_o),
         .data1_i(Mux_Branch_o),
         .select_i(jump),
         .data_o(Mux_Jump_o)
