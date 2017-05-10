@@ -33,16 +33,16 @@ output         ALUSrc_o;
 output [2-1:0] RegDst_o;
 //0 i type 1 r type 2 save PC+8
 output         Branch_o;
-output [3-1:0] BranchType_o;
+output         reg  [3-1:0]  BranchType_o;
 //BEQ 1 BNE 2 BLE 3 BLE 4 BNEZ 5
-output         Jump_o;
-output         MemRead_o;
-output         MemWrite_o;
-output [2-1:0] MemtoReg_o;
+output         reg Jump_o;
+output         reg MemRead_o;
+output         reg MemWrite_o;
+output         reg [2-1:0] MemtoReg_o;
 //from ALUresult 0, from memory 1 from immidiate value 2
 
 //
-output         jr,jal;
+output         reg jal;
 //Internal Signals
 reg    [3-1:0] ALU_op_o;
 reg            ALUSrc_o;

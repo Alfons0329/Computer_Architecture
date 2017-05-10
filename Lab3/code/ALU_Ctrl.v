@@ -21,7 +21,7 @@ input      [6-1:0] funct_i;
 input      [3-1:0] ALUOp_i;
 
 output     [5-1:0] ALUCtrl_o;
-output     jr;
+output reg  jr;
 //Internal Signals
 reg        [5-1:0] ALUCtrl_o;
 
@@ -50,7 +50,7 @@ localparam
 
 always@(*)
 begin
-    if(ALUOp_i=5'b010&&funct_i=6'h8)
+    if(ALUOp_i==5'b010&&funct_i==6'h8)
     begin
         jr=1;
     end

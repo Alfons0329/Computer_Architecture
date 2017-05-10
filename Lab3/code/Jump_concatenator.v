@@ -3,7 +3,7 @@ module Jump_cat
     pc_in_i,
     jump_addr_i,
     pc_out_o
-)
+);
 input [31:0] pc_in_i;
 input [25:0]jump_addr_i;
 

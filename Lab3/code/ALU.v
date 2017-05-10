@@ -41,11 +41,11 @@ begin
 		else if(ctrl_i==4'd10)//bne
 			zero_o = (result_o == 0) ? 0 : 1 ;
 //2017/5/4
-        else if(crtl_i==15) //BLE
+        else if(ctrl_i==15) //BLE
             zero_o = (src1_i<=src2_i) ? 1 : 0 ;
-        else if(crtl_i==16) //BLT
+        else if(ctrl_i==16) //BLT
             zero_o = (src1_i<src2_i) ? 1 : 0 ;
-        else if(crtl_i==15) //BNEZ
+        else if(ctrl_i==15) //BNEZ
             zero_o = (src1_i!=0) ? 1 : 0 ;
 		else
 			zero_o = 0;
