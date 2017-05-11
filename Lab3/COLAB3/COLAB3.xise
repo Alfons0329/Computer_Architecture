@@ -15,22 +15,6 @@
   <version xil_pn:ise_version="14.7" xil_pn:schema_version="2"/>
 
   <files>
-    <file xil_pn:name="../code/Adder.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/ALU.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/ALU_Ctrl.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Data_Memory.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Decoder.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Instr_Memory.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Jump_concatenator.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/MUX_2to1.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/MUX_4to1.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/ProgramCounter.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Reg_File.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Shift_Left_Two_26.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Shift_Left_Two_32.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Sign_Extend.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/Simple_Single_CPU.v" xil_pn:type="FILE_VERILOG"/>
-    <file xil_pn:name="../code/testbench.v" xil_pn:type="FILE_VERILOG"/>
     <file xil_pn:name="Adder.v" xil_pn:type="FILE_VERILOG">
       <association xil_pn:name="BehavioralSimulation" xil_pn:seqID="14"/>
       <association xil_pn:name="Implementation" xil_pn:seqID="20"/>

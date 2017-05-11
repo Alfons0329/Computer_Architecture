@@ -52,6 +52,7 @@ always@(*)
 begin
     if(ALUOp_i==5'b00010&&funct_i==6'h8)
     begin
+        $display("Here we jr!!!");
         jr=1;
     end
     else

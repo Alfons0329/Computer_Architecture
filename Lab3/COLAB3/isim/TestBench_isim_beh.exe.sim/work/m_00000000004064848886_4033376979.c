@@ -21,7 +21,7 @@
 #include <malloc.h>
 #define alloca _alloca
 #endif
-static const char *ng0 = "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Adder.v";
+static const char *ng0 = "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Adder.v";
 
 
 

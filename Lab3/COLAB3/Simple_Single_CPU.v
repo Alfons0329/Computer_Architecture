@@ -134,6 +134,7 @@ Reg_File RF(
         .RDaddr_i(Mux_Write_Reg_Select_o) ,
         .RDdata_i(Mux_Write_Data_Select_o)  ,
         .RegWrite_i (regwrite),
+		  .jr_i(jr),
         .RSdata_o(rd1_alu) ,
         .RTdata_o(rd2_mux2)
         );

@@ -10,12 +10,13 @@
 //--------------------------------------------------------------------------------
 module Reg_File(
     clk_i,
-	rst_i,
+	 rst_i,
     RSaddr_i,
     RTaddr_i,
     RDaddr_i,
     RDdata_i,
     RegWrite_i,
+	 jr_i,
     RSdata_o,
     RTdata_o
     );
@@ -24,6 +25,7 @@ module Reg_File(
 input           clk_i;
 input           rst_i;
 input           RegWrite_i;
+input           jr_i;
 input  [5-1:0]  RSaddr_i;
 input  [5-1:0]  RTaddr_i;
 input  [5-1:0]  RDaddr_i;
@@ -54,9 +56,9 @@ always @( posedge rst_i or posedge clk_i  ) begin
         Reg_File[28] <= 0; Reg_File[29] <= 128; Reg_File[30] <= 0; Reg_File[31] <= 0;
 	end
     else begin
-        if(RegWrite_i) 
+        if(RegWrite_i&&!jr_i) 
             Reg_File[RDaddr_i] <= RDdata_i;	
-		else 
+		  else 
 		    Reg_File[RDaddr_i] <= Reg_File[RDaddr_i];
 	end
 end

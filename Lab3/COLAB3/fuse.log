@@ -1,27 +1,27 @@
-Running: C:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\fuse.exe -intstyle ise -incremental -lib unisims_ver -lib unimacro_ver -lib xilinxcorelib_ver -lib secureip -o D:/Users/afhwu0329/Desktop/Lab3/COLAB3/TestBench_isim_beh.exe -prj D:/Users/afhwu0329/Desktop/Lab3/COLAB3/TestBench_beh.prj work.TestBench work.glbl 
+Running: C:\Xilinx\14.7\ISE_DS\ISE\bin\nt64\unwrapped\fuse.exe -intstyle ise -incremental -lib unisims_ver -lib unimacro_ver -lib xilinxcorelib_ver -lib secureip -o D:/Users/hcyu/Desktop/COLAB3/COLAB3/TestBench_isim_beh.exe -prj D:/Users/hcyu/Desktop/COLAB3/COLAB3/TestBench_beh.prj work.TestBench work.glbl 
 ISim P.20131013 (signature 0x7708f090)
 Number of CPUs detected in this system: 8
 Turning on mult-threading, number of parallel sub-compilation jobs: 16 
 Determining compilation order of HDL files
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Sign_Extend.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Shift_Left_Two_32.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Shift_Left_Two_26.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Reg_File.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/ProgramCounter.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/MUX_4to1.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/MUX_2to1.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Jump_concatenator.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Instr_Memory.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Decoder.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Data_Memory.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/ALU_Ctrl.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/ALU.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Adder.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Simple_Single_CPU.v" into library work
-Analyzing Verilog file "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/testbench.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Sign_Extend.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Shift_Left_Two_32.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Shift_Left_Two_26.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Reg_File.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/ProgramCounter.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/MUX_4to1.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/MUX_2to1.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Jump_concatenator.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Instr_Memory.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Decoder.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Data_Memory.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/ALU_Ctrl.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/ALU.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Adder.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Simple_Single_CPU.v" into library work
+Analyzing Verilog file "D:/Users/hcyu/Desktop/COLAB3/COLAB3/testbench.v" into library work
 Analyzing Verilog file "C:/Xilinx/14.7/ISE_DS/ISE//verilog/src/glbl.v" into library work
 Starting static elaboration
-WARNING:HDLCompiler:189 - "D:/Users/afhwu0329/Desktop/Lab3/COLAB3/Simple_Single_CPU.v" Line 177: Size mismatch in connection of port <ctrl_i>. Formal port size is 4-bit while actual signal size is 5-bit.
+WARNING:HDLCompiler:189 - "D:/Users/hcyu/Desktop/COLAB3/COLAB3/Simple_Single_CPU.v" Line 179: Size mismatch in connection of port <ctrl_i>. Formal port size is 4-bit while actual signal size is 5-bit.
 Completed static elaboration
 Compiling module MUX_2to1
 Compiling module ProgramCounter
@@ -42,5 +42,8 @@ Compiling module Simple_Single_CPU
 Compiling module TestBench
 Compiling module glbl
 Time Resolution for simulation is 1ps.
-Waiting for 3 sub-compilation(s) to finish...
-FATAL_ERROR:Simulator:Fuse.cpp:209:1.133 - Failed to compile one of the generated C files. Please recompile with -mt off -v 1 switch to identify which design unit failed.  For technical support on this issue, please visit http://www.xilinx.com/support.
+Waiting for 1 sub-compilation(s) to finish...
+Compiled 18 Verilog Units
+Built simulation executable D:/Users/hcyu/Desktop/COLAB3/COLAB3/TestBench_isim_beh.exe
+Fuse Memory Usage: 30172 KB
+Fuse CPU Usage: 576 ms
