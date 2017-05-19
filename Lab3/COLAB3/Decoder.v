@@ -251,7 +251,7 @@ always@(*) begin
             MemtoReg_o = 0;//data from mem to reg
             jal = 0;
         end
-        6'hf:
+        6'hf:　//li
         begin
             ALU_op_o = 13;
             ALUSrc_o = 0; //signextimm value
@@ -263,7 +263,7 @@ always@(*) begin
             Jump_o = 0; //YES We jump
             MemRead_o = 0; //read data from memory
             MemWrite_o = 0;
-            MemtoReg_o = 0;//data from mem to reg
+            MemtoReg_o = 2;//data from mem to reg
             jal = 0;
         end
 	endcase
