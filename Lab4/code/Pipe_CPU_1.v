@@ -1,4 +1,4 @@
-//Subject:     CO project 4 - Pipe CPU 1
+Fwd_Mux_ALUSrc_up_o//Subject:     CO project 4 - Pipe CPU 1
 //--------------------------------------------------------------------------------
 //Version:     1
 //--------------------------------------------------------------------------------
@@ -50,6 +50,8 @@ wire [31:0]Add_pc_IFID_o;
 ////////////////////////////////decoder/////////////////////////////////
 wire[9:0]decoder_o;
 ///////////////////////////////decoder end////////////////////////////////
+///////////////////////////////Mux_Control////////////////////////////////
+wire[9:0]Mux_Control_o;
 ///////////////////////////////register //////////////////////////////////
 wire [31:0] Reg_RS_o;
 wire [31:0] Reg_RT_o;
@@ -64,23 +66,29 @@ wire Haz_pc_o,Haz_IFID_o,Haz_IF_Flush_o,Haz_EX_Flush_o,Haz_ID_Flush_o;
 
 /**** EX stage ****/
 //////////////////////////////////////Up blue part//////////////////////
-wire []IDEX_WB_o;
-wire []IDEX_M_o;
-wire []IDEX_EX_o;
+wire [1:0]IDEX_WB_o;
+wire [2:0]IDEX_M_o;
+wire [2:0]IDEX_ALUOp_o;
+wire IDEX_Reg_Dst_o;
+wire IDEX_ALUSrc_o;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////from IDEX//////////////////////////
 wire [31:0]Add_pc_IDEX_o;
 wire [31:0]Reg_RS_IDEX_o;
 wire [31:0]Reg_RT_IDEX_o;
 wire [31:0]SE_IDEX_o;
+wire [4:0]RS_addr_IDEX_o;
 wire [4:0]RT_addr_IDEX_o;
 wire [4:0]RD_addr_IDEX_o;
 ///////////////////////////////////from IDEX end/////////////////////////
+///////////////////////////////////ALU_Ctrl//////////////////////////////
+wire [3:0]ALU_Ctrl_o;
+//////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////Mux_IDEX_to_EXMEM_WB//////////////////
-wire []Mux_IDEX_to_EXMEM_WB_o;
+wire [1:0]Mux_IDEX_to_EXMEM_WB_o;
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////Mux_IDEX_to_EXMEM_M///////////////////
-wire []Mux_IDEX_to_EXMEM_M_o;
+wire [2:0]Mux_IDEX_to_EXMEM_M_o;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////Shift_Left_Two_32///////////////////
 wire [31:0]Shift_Left_Two_32_o;
@@ -101,24 +109,24 @@ wire [31:0]Mux_ALUSrc_downleft_o;
 //////////////////////////////////Mux_ALUSrc_downright////////////////////
 wire [31:0]Mux_ALUSrc_downright_o;
 /////////////////////////////////////////////////////////////////////////
-//////////////////////////////////Mux_RegWriteDestSelectionRSRT///////////////
-wire [31:0]Mux_RegWriteDestSelectionRSRT_o;
+//////////////////////////////////Mux_RegDst///////////////
+wire [31:0]Mux_RegDst_o;
 /////////////////////////////////////////////////////////////////////////
 //control signal
 /////////////////////////////////Forwarding_unit/////////////////////////
-wire Fwd_Mux_ALUSrc_up,Fwd_Mux_ALUSrc_downleft,Fwd_Mux_ALUSrc_downright
+wire [1:0]Fwd_Mux_ALUSrc_up_o,Fwd_Mux_ALUSrc_downleft_o
 /////////////////////////////////////////////////////////////////////////
 
 /**** MEM stage ****/
 //////////////////////////////////////Up blue part//////////////////////
-wire []EXMEM_WB_o;
-wire []EXMEM_M_o;
+wire [1:0]EXMEM_WB_o;
+wire [1:0]EXMEM_M_o;
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////From EXMEM out///////////////////////
 wire [31:0]ALU_Result_EXMEM_o;
 wire [31:0]Mux_ALUSrc_downleft_EXMEM_o;
 wire [31:0]Adder_IDEX_to_EXMEM_EXMEM_o;
-wire [4:0]Mux_RegWriteDestSelectionRSRT_EXMEM_o;
+wire [4:0]Mux_RegDst_EXMEM_o;
 wire Zero_EXMEM_o;
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////From Data_Memory/////////////////////
@@ -134,12 +142,13 @@ assign Mux_PC_Source_Select = EXMEM_M_o & Zero_EXMEM_o;
 
 /**** WB stage ****/
 //////////////////////////////////////Up blue part//////////////////////
-wire RegWrite_MEMWB_o;
+wire [1:0]MEMWB_WB_o;
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////From MEMWB out///////////////////////
-wire []MEMWB_WB_o;
+
 wire [31:0]Data_Memory_MEMWB_o;
 wire [31:0]ALU_Result_MEMWB_o;
+wire [4:0]Mux_RegDst_MEMWB_o;
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////Mux_MEMWB/////////////////////////////
 wire [31:0]Mux_MEMWB_o;
@@ -189,24 +198,6 @@ Pipe_Reg #(.size(64)) IF_ID(       //N is the total length of input/output
 		);
 
 //Instantiate the components in ID stage
-Decoder Control(
-    .instr_op_i(Instruction_Mem_IFID_o[31:26]),
-    .control_o(control_o)
-		);
-
-
-
-
-
-MUX_4to1 #(.size(xxxxxxxxxxxxxxx))Control_to_IDEX(
-
-		);
-
-Reg_File RF(
-
-		);
-
-
 Hazard_detection_unit Haz(
     .IDEX_M_i(IDEX_M_o);
     .Reg_RS_IFID_i(Instruction_Mem_IFID_o[25:21]),
@@ -219,86 +210,137 @@ Hazard_detection_unit Haz(
     .Haz_EX_Flush_o(Haz_EX_Flush_o),
     .Haz_ID_Flush_o(Haz_ID_Flush_o)
     );
+Decoder Control(
+    .instr_op_i(Instruction_Mem_IFID_o[31:26]),
+    .control_o(control_o)
+		);
+MUX_4to1 #(.size(10)) Mux_Control(
+        .data0_i(control_o),
+        .data1_i(10'd0),
+        .select_i(Haz_ID_Flush_o),
+        .data_o(Mux_Control_o)
+		);
+
+Reg_File RF(
+        .clk_i(clk_i),
+        .rst_i(rst_i) ,
+        .RSaddr_i(Instruction_Mem_IFID_o[25:21]) ,
+        .RTaddr_i(Instruction_Mem_IFID_o[20:16]) ,
+        .RDaddr_i(Mux_RegDst_MEMWB_o) ,
+        .RDdata_i(Mux_MEMWB_o)  ,
+        .RegWrite_i (MEMWB_WB_o[1]),
+
+        .RSdata_o(Reg_RS_o) ,
+        .RTdata_o(Reg_RT_o)
+		);
+
 
 Sign_Extend Sign_Extend(
-
+        .data_i(Instruction_Mem_IFID_o[15:0]),
+        .data_o(SE_o)
 		);
 
-Pipe_Reg #(.size(N)) ID_EX(
-
+Pipe_Reg #(.size(153)) ID_EX(
+        .data_i({Mux_Control_o[9:8],Mux_Control_o[7:5],Mux_Control_o[4:0]
+            ,Add_pc_IFID_o,Reg_RS_o,Reg_RT_o,SE_o,Instruction_Mem_IFID_o[25:21],Instruction_Mem_IFID_o[20:16]
+            ,Instruction_Mem_IFID_o[15:11]})
+        .data_o({IDEX_WB_o,IDEX_M_o,IDEX_Reg_Dst_o
+            ,IDEX_ALUOp_o,IDEX_ALUSrc_o,Add_pc_IDEX_o,Reg_RS_IDEX_o,Reg_RT_IDEX_o,SE_IDEX_o
+            ,RS_addr_IDEX_o,RT_addr_IDEX_o,RD_addr_IDEX_o})
 		);
-
 //Instantiate the components in EX stage
-MUX_2to1 #(.size(1)) Mux_IDEX_to_EXMEM_WB(
-        .data0_i(),
-        .data1_i(),
-        .select_i(),
-        .data_o()
+MUX_2to1 #(.size(2)) Mux_IDEX_to_EXMEM_WB(
+        .data0_i(IDEX_WB_o),
+        .data1_i(2'd0),
+        .select_i(Haz_EX_Flush_o),
+        .data_o(Mux_IDEX_to_EXMEM_WB_o)
         );
-MUX_2to1 #(.size(1)) Mux_IDEX_to_EXMEM_M(
-        .data0_i(),
-        .data1_i(),
-        .select_i(),
-        .data_o()
+MUX_2to1 #(.size(3)) Mux_IDEX_to_EXMEM_M(
+        .data0_i(IDEX_M_o),
+        .data1_i(3'd0),
+        .select_i(Haz_EX_Flush_o),
+        .data_o(Mux_IDEX_to_EXMEM_M_o)
         );
 Shift_Left_Two_32 Shifter32(
-        .data_i(se_IDEX_o),
+        .data_i(SE_IDEX_o),
         .data_o(Shift_Left_Two_32_o)
         );
 Adder Adder_IDEX_to_EXMEM(
-        .src1_i(),
-        .src2_i(),
+        .src1_i(Add_pc_IDEX_o),
+        .src2_i(Shift_Left_Two_32_o),
         .sum_o(Adder_IDEX_to_EXMEM_o)
         );
 ALU_Ctrl ALU_Ctrl(
-
+        .funct_i(SE_IDEX_o[5:0]),
+        .ALUOp_i(IDEX_ALUOp_o),
+        .ALU_Ctrl(ALU_Ctrl_o)
         );
 ALU ALU(
-
+        .src1_i(Mux_ALUSrc_up_o),
+        .src2_i(Mux_ALUSrc_downright_o),
+        //.shamt(),
+        .ctrl_i(ALU_Ctrl_o),
+        .result_o(ALU_Result_o),
+        .zero_o(Zero_o)
 		);
 
 MUX_4to1 #(.size(32)) Mux_ALUSrc_up(
-        .data0_i(),
-        .data1_i(),
-        .data2_i(),
-        .data3_i(),
-        .select_i(),
-        .data_o()
+        .data0_i(Reg_RS_IDEX_o),
+        .data1_i(ALU_Result_EXMEM_o),
+        .data2_i(Mux_MEMWB_o),
+        .data3_i(32'd0),
+        .select_i(Fwd_Mux_ALUSrc_up_o),
+        .data_o(Mux_ALUSrc_up_o)
 
         );
 MUX_4to1 #(.size(32)) Mux_ALUSrc_downleft(
-        .data0_i(),
-        .data1_i(),
-        .data2_i(),
-        .data3_i(),
-        .select_i(),
-        .data_o()
+        .data0_i(Reg_RT_IDEX_o),
+        .data1_i(ALU_Result_EXMEM_o),
+        .data2_i(Mux_MEMWB_o),
+        .data3_i(32'd0),
+        .select_i(Fwd_Mux_ALUSrc_downleft_o),
+        .data_o(Mux_ALUSrc_downleft_o)
         );
 MUX_2to1 #(.size(32)) Mux_ALUSrc_downright(
-        .data0_i(),
-        .data1_i(),
-        .select_i(),
-        .data_o()
+        .data0_i(Mux_ALUSrc_downleft_o),
+        .data1_i(SE_IDEX_o),
+        .select_i(IDEX_ALUSrc_o),
+        .data_o(Mux_ALUSrc_downright_o)
         );
 
-MUX_2to1 #(.size(5)) Mux_RegWriteDestSelectionRSRT(
-        .data0_i(),
-        .data1_i(),
-        .select_i(),
-        .data_o()
+MUX_2to1 #(.size(5)) Mux_RegDst(
+        .data0_i(RT_addr_IDEX_o),
+        .data1_i(RD_addr_IDEX_o),
+        .select_i(IDEX_Reg_Dst_o),
+        .data_o(Mux_RegDst_o)
         );
 Forwarding_unit Fwd(
+        .RS_addr_IDEX_i(RS_addr_IDEX_o),
+        .RT_addr_IDEX_i(RT_addr_IDEX_o),
+        .Mux_RegDst_EXMEM_i(Mux_RegDst_EXMEM_o),
+        .Mux_RegDst_MEMWB_i(Mux_RegDst_MEMWB_o),
+        .EXMEM_WB1_i(EXMEM_WB_o[1]),
+        .MEMWB_WB1_i(MEMWB_WB_o[1])
 
+        .Fwd_Mux_ALUSrc_up_o(Fwd_Mux_ALUSrc_up_o),
+        .Fwd_Mux_ALUSrc_downleft_o(Fwd_Mux_ALUSrc_downleft_o)
     );
-Pipe_Reg #(.size(N)) EX_MEM(
-        .
-
+Pipe_Reg #(.size(80)) EX_MEM(
+        .data_i({Mux_IDEX_to_EXMEM_WB_o,Mux_IDEX_to_EXMEM_M_o,Adder_IDEX_to_EXMEM_o
+            ,Zero_o,ALU_Result_o,Mux_ALUSrc_downleft_o,Mux_RegDst_o)
+        .data_o(EXMEM_WB_o,EXMEM_M_o,Adder_IDEX_to_EXMEM_EXMEM_o
+            ,Zero_EXMEM_o,ALU_Result_EXMEM_o,Mux_ALUSrc_downleft_EXMEM_o
+            ,Mux_RegDst_EXMEM_o)
 		);
-
 
 //Instantiate the components in MEM stage
 Data_Memory DM(
-
+        .clk_i(clk_i),
+        .addr_i(ALU_Result_o),
+        .data_i(Mux_ALUSrc_downleft_EXMEM_o),
+        .MemRead_i(EXMEM_M_o),
+        .MemWrite_i(memwrite),
+        .data_o(Data_Memory_o)
 	    );
 
 Pipe_Reg #(.size(N)) MEM_WB(
