@@ -13,7 +13,7 @@ module Pipe_CPU_1(
 		rst_i
 		);
 /***************************************
-*TO DO LIST :  change add1_o to pc_next_IFID_i
+*TO DO LIST :
 *ID control not understanding how to do
 *
 *
@@ -37,20 +37,18 @@ input rst_i;
 /****************************************
 Internal signal
 ****************************************/
-wire [31:0]instruction_IFID_i;
+wire [31:0]Instruction_Mem_o;
 /**** IF stage ****/
 wire [31:0]pc_im;
-wire [31:0]pc_next_IFID_i;
+wire [31:0]Add_pc_o;
+////////////////////////////////Mux_PC_Source///////////////////////////
+wire [31:0]Mux_PC_Source_o;
+////////////////////////////////////////////////////////////////////////
 /**** ID stage ****/
-wire [31:0]pc_next_IFID_o;
+wire [31:0]Instruction_Mem_IFID_o;
+wire [31:0]Add_pc_IFID_o;
 ////////////////////////////////decoder/////////////////////////////////
-wire [31:0] instruction_IFID_o;
-wire [4:0] alu_op;
-wire [2:0] branchtype;
-wire [1:0] regdst,memtoreg;
-wire alu_src,branch,regwrite,jump,memread,memwrite,jal;
-wire []decoder_to_MUX_o;
-assign decoder_to_MUX_o={alu_op,branchtype,,,,};
+wire[9:0]decoder_o;
 ///////////////////////////////decoder end////////////////////////////////
 ///////////////////////////////register //////////////////////////////////
 wire [31:0] Reg_RS_o;
@@ -71,12 +69,12 @@ wire []IDEX_M_o;
 wire []IDEX_EX_o;
 /////////////////////////////////////////////////////////////////////////
 /////////////////////////////////////from IDEX//////////////////////////
-wire [31:0]pc_next_IDEX_o;
+wire [31:0]Add_pc_IDEX_o;
 wire [31:0]Reg_RS_IDEX_o;
 wire [31:0]Reg_RT_IDEX_o;
 wire [31:0]SE_IDEX_o;
-wire [4:0]RT_addr_o_IDEX;
-wire [4:0]RD_addr_o_IDEX;
+wire [4:0]RT_addr_IDEX_o;
+wire [4:0]RD_addr_IDEX_o;
 ///////////////////////////////////from IDEX end/////////////////////////
 ///////////////////////////////////Mux_IDEX_to_EXMEM_WB//////////////////
 wire []Mux_IDEX_to_EXMEM_WB_o;
@@ -126,6 +124,11 @@ wire Zero_EXMEM_o;
 ////////////////////////////////////From Data_Memory/////////////////////
 wire [31:0]Data_Memory_o;
 /////////////////////////////////////////////////////////////////////////
+///////////////////////////////////////PC_Src////////////////////////////
+wire Mux_PC_Source_Select;
+assign Mux_PC_Source_Select = EXMEM_M_o & Zero_EXMEM_o;
+/////////////////////////////////////////////////////////////////////////
+
 //control signal
 
 
@@ -141,6 +144,7 @@ wire [31:0]ALU_Result_MEMWB_o;
 ///////////////////////////////////Mux_MEMWB/////////////////////////////
 wire [31:0]Mux_MEMWB_o;
 /////////////////////////////////////////////////////////////////////////
+
 //control signal
 
 
@@ -148,28 +152,52 @@ wire [31:0]Mux_MEMWB_o;
 Instnatiate modules
 ****************************************/
 //Instantiate the components in IF stage
-MUX_2to1 #(.size(32))PC_Source(
-
+MUX_2to1 #(.size(32))Mux_PC_Source(
+        .data0_i(Add_pc_o),
+        .data1_i(Adder_IDEX_to_EXMEM_EXMEM_o),
+        .select_i(Mux_PC_Source_Select),
+        .data_o(Mux_PC_Source_o)
 		);
 
 ProgramCounter PC(
-
+        .clk_i(clk_i),
+        .rst_i (rst_i),
+        .pc_control(Haz_pc_o),
+        .pc_in_i(Mux_PC_Source_o) ,
+        .pc_out_o(pc_im)
         );
 
 Instr_Memory IM(
-
+        .addr_i(pc_im)
+        .instr_o(Instruction_Mem_o)
 	    );
 
 Adder Add_pc(
-
+        .src1_i(pc_im),
+        .src2_i(32'd4),
+        .sum_o(Add_pc_o)
 		);
 
 
-Pipe_Reg #(.size(N)) IF_ID(       //N is the total length of input/output
-
+Pipe_Reg #(.size(64)) IF_ID(       //N is the total length of input/output
+        .clk_i(clk_i),
+        .rst_i(rst_i),
+        .IFID_control(Haz_IFID_o),
+        .IFFlush_control(Haz_IF_Flush_o),
+        .data_i({Add_pc_o,Instruction_Mem_o}),
+        .data_o({Add_pc_IFID_o,Instruction_Mem_IFID_o})
 		);
 
 //Instantiate the components in ID stage
+Decoder Control(
+    .instr_op_i(Instruction_Mem_IFID_o[31:26]),
+    .control_o(control_o)
+		);
+
+
+
+
+
 MUX_4to1 #(.size(xxxxxxxxxxxxxxx))Control_to_IDEX(
 
 		);
@@ -178,12 +206,18 @@ Reg_File RF(
 
 		);
 
-Decoder Control(
-
-		);
 
 Hazard_detection_unit Haz(
+    .IDEX_M_i(IDEX_M_o);
+    .Reg_RS_IFID_i(Instruction_Mem_IFID_o[25:21]),
+    .Reg_RT_IFID_i(Instruction_Mem_IFID_o[20:16]),
+    .Reg_RT_IDEX_i(Reg_RT_IDEX_o),
 
+    .Haz_pc_o(Haz_pc_o),
+    .Haz_IFID_o(Haz_IFID_o),
+    .Haz_IF_Flush_o(Haz_IF_Flush_o),
+    .Haz_EX_Flush_o(Haz_EX_Flush_o),
+    .Haz_ID_Flush_o(Haz_ID_Flush_o)
     );
 
 Sign_Extend Sign_Extend(
