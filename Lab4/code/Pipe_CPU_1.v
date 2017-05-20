@@ -48,10 +48,10 @@ wire [31:0]Mux_PC_Source_o;
 wire [31:0]Instruction_Mem_IFID_o;
 wire [31:0]Add_pc_IFID_o;
 ////////////////////////////////decoder/////////////////////////////////
-wire[9:0]decoder_o;
+wire[11:0]control_o;
 ///////////////////////////////decoder end////////////////////////////////
 ///////////////////////////////Mux_Control////////////////////////////////
-wire[9:0]Mux_Control_o;
+wire[11:0]Mux_Control_o;
 ///////////////////////////////register //////////////////////////////////
 wire [31:0] Reg_RS_o;
 wire [31:0] Reg_RT_o;
@@ -68,7 +68,7 @@ wire Haz_pc_o,Haz_IFID_o,Haz_IF_Flush_o,Haz_EX_Flush_o,Haz_ID_Flush_o;
 //////////////////////////////////////Up blue part//////////////////////
 wire [1:0]IDEX_WB_o;
 wire [2:0]IDEX_M_o;
-wire [2:0]IDEX_ALUOp_o;
+wire [4:0]IDEX_ALUOp_o;
 wire IDEX_Reg_Dst_o;
 wire IDEX_ALUSrc_o;
 /////////////////////////////////////////////////////////////////////////
@@ -119,8 +119,9 @@ wire [1:0]Fwd_Mux_ALUSrc_up_o,Fwd_Mux_ALUSrc_downleft_o
 
 /**** MEM stage ****/
 //////////////////////////////////////Up blue part//////////////////////
-wire [1:0]EXMEM_WB_o;
-wire [1:0]EXMEM_M_o;
+wire [2:0]EXMEM_M_o; //2Branch_o 1 MemRead_o 0 MemWrite_o
+wire [1:0]EXMEM_WB_o; //1 RegWrite_o 0 MemRead_o
+
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////From EXMEM out///////////////////////
 wire [31:0]ALU_Result_EXMEM_o;
@@ -134,7 +135,7 @@ wire [31:0]Data_Memory_o;
 /////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////////PC_Src////////////////////////////
 wire Mux_PC_Source_Select;
-assign Mux_PC_Source_Select = EXMEM_M_o & Zero_EXMEM_o;
+assign Mux_PC_Source_Select = EXMEM_M_o[2] & Zero_EXMEM_o;
 /////////////////////////////////////////////////////////////////////////
 
 //control signal
@@ -142,7 +143,7 @@ assign Mux_PC_Source_Select = EXMEM_M_o & Zero_EXMEM_o;
 
 /**** WB stage ****/
 //////////////////////////////////////Up blue part//////////////////////
-wire [1:0]MEMWB_WB_o;
+wire [1:0]MEMWB_WB_o; //1 RegWrite_o 0 MemRead_o
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////From MEMWB out///////////////////////
 
@@ -214,9 +215,9 @@ Decoder Control(
     .instr_op_i(Instruction_Mem_IFID_o[31:26]),
     .control_o(control_o)
 		);
-MUX_4to1 #(.size(10)) Mux_Control(
+MUX_4to1 #(.size(12)) Mux_Control(
         .data0_i(control_o),
-        .data1_i(10'd0),
+        .data1_i(12'd0),
         .select_i(Haz_ID_Flush_o),
         .data_o(Mux_Control_o)
 		);
@@ -240,12 +241,14 @@ Sign_Extend Sign_Extend(
         .data_o(SE_o)
 		);
 
-Pipe_Reg #(.size(153)) ID_EX(
-        .data_i({Mux_Control_o[9:8],Mux_Control_o[7:5],Mux_Control_o[4:0]
-            ,Add_pc_IFID_o,Reg_RS_o,Reg_RT_o,SE_o,Instruction_Mem_IFID_o[25:21],Instruction_Mem_IFID_o[20:16]
+Pipe_Reg #(.size(155)) ID_EX(
+        .data_i({Mux_Control_o[11:10],Mux_Control_o[9:7],Mux_Control_o[6:0]
+            ,Add_pc_IFID_o,Reg_RS_o,Reg_RT_o
+            ,SE_o,Instruction_Mem_IFID_o[25:21],Instruction_Mem_IFID_o[20:16]
             ,Instruction_Mem_IFID_o[15:11]})
         .data_o({IDEX_WB_o,IDEX_M_o,IDEX_Reg_Dst_o
-            ,IDEX_ALUOp_o,IDEX_ALUSrc_o,Add_pc_IDEX_o,Reg_RS_IDEX_o,Reg_RT_IDEX_o,SE_IDEX_o
+            ,IDEX_ALUOp_o,IDEX_ALUSrc_o,Add_pc_IDEX_o
+            ,Reg_RS_IDEX_o,Reg_RT_IDEX_o,SE_IDEX_o
             ,RS_addr_IDEX_o,RT_addr_IDEX_o,RD_addr_IDEX_o})
 		);
 //Instantiate the components in EX stage
@@ -343,13 +346,17 @@ Data_Memory DM(
         .data_o(Data_Memory_o)
 	    );
 
-Pipe_Reg #(.size(N)) MEM_WB(
-
+Pipe_Reg #(.size(71)) MEM_WB(
+        .data_i(EXMEM_WB_o,Data_Memory_o,ALU_Result_EXMEM_o,Mux_RegDst_EXMEM_o),
+        .data_o(MEMWB_WB_o,Data_Memory_MEMWB_o,ALU_Result_MEMWB_o,Mux_RegDst_MEMWB_o),
 		);
 
 //Instantiate the components in WB stage
 MUX_2to1 #(.size(32)) Mux_MEMWB(
-
+        .data0_i(Data_Memory_MEMWB_o),
+        .data1_i(ALU_Result_MEMWB_o),
+        .select_i(~MEMWB_WB_o[0]), //Inverse selection since the diagram is up0 down 1
+        .data_o(Mux_MEMWB_o)
         );
 
 /****************************************
