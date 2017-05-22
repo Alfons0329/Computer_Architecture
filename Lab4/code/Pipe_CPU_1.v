@@ -66,8 +66,9 @@ wire Haz_pc_o,Haz_IFID_o,Haz_IF_Flush_o,Haz_EX_Flush_o,Haz_ID_Flush_o;
 
 /**** EX stage ****/
 //////////////////////////////////////Up blue part//////////////////////
-wire [1:0]IDEX_WB_o;
-wire [2:0]IDEX_M_o;
+//from top to down
+wire [1:0]IDEX_WB_o;//1 RegWrite_o 0 MemRead_o
+wire [2:0]IDEX_M_o; //2Branch_o 1 MemRead_o 0 MemWrite_o
 wire [4:0]IDEX_ALUOp_o;
 wire IDEX_Reg_Dst_o;
 wire IDEX_ALUSrc_o;
@@ -119,8 +120,10 @@ wire [1:0]Fwd_Mux_ALUSrc_up_o,Fwd_Mux_ALUSrc_downleft_o
 
 /**** MEM stage ****/
 //////////////////////////////////////Up blue part//////////////////////
-wire [2:0]EXMEM_M_o; //2Branch_o 1 MemRead_o 0 MemWrite_o
-wire [1:0]EXMEM_WB_o; //1 RegWrite_o 0 MemRead_o
+//from top to down
+wire [1:0]EXMEM_WB_o; //1 RegWrite_o ,0 MemRead_o
+wire [2:0]EXMEM_M_o; //2Branch_o ,1 MemRead_o ,0 MemWrite_o
+
 
 /////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////From EXMEM out///////////////////////
@@ -189,21 +192,23 @@ Adder Add_pc(
 		);
 
 
-Pipe_Reg #(.size(64)) IF_ID(       //N is the total length of input/output
+Pipe_Reg_IFID #(.size(64)) IF_ID(       //N is the total length of input/output
         .clk_i(clk_i),
         .rst_i(rst_i),
-        .IFID_control(Haz_IFID_o),
-        .IFFlush_control(Haz_IF_Flush_o),
-        .data_i({Add_pc_o,Instruction_Mem_o}),
-        .data_o({Add_pc_IFID_o,Instruction_Mem_IFID_o})
+        .Haz_IFID_i(Haz_IFID_o),
+        //.IFFlush_control(Haz_IF_Flush_o), //this one is only needed for branch hazard but we dont have such hazard in our COLAB4
+        .data_i({Add_pc_o
+            ,Instruction_Mem_o}),
+        .data_o({Add_pc_IFID_o
+            ,Instruction_Mem_IFID_o})
 		);
 
 //Instantiate the components in ID stage
 Hazard_detection_unit Haz(
-    .IDEX_M_i(IDEX_M_o);
-    .Reg_RS_IFID_i(Instruction_Mem_IFID_o[25:21]),
-    .Reg_RT_IFID_i(Instruction_Mem_IFID_o[20:16]),
-    .Reg_RT_IDEX_i(Reg_RT_IDEX_o),
+    .RS_addr_IFID_i(Instruction_Mem_IFID_o[25:21]),
+    .RT_addr_IFID_i(Instruction_Mem_IFID_o[20:16]),
+    .RT_addr_IDEX_i(RT_addr_IDEX_o),
+    .MemRead_IDEX_i(IDEX_M_o),
 
     .Haz_pc_o(Haz_pc_o),
     .Haz_IFID_o(Haz_IFID_o),
@@ -240,16 +245,28 @@ Sign_Extend Sign_Extend(
         .data_i(Instruction_Mem_IFID_o[15:0]),
         .data_o(SE_o)
 		);
-
+//control_o={RegWrite_o,MemRead_o,Branch_o,MemRead_o,MemWrite_o,RegDst_o,ALU_op_o,ALUSrc_o};
 Pipe_Reg #(.size(155)) ID_EX(
-        .data_i({Mux_Control_o[11:10],Mux_Control_o[9:7],Mux_Control_o[6:0]
-            ,Add_pc_IFID_o,Reg_RS_o,Reg_RT_o
-            ,SE_o,Instruction_Mem_IFID_o[25:21],Instruction_Mem_IFID_o[20:16]
+        .data_i({Mux_Control_o[11:10]
+            ,Mux_Control_o[9:7]
+            ,Mux_Control_o[6:0]
+            ,Add_pc_IFID_o
+            ,Reg_RS_o
+            ,Reg_RT_o
+            ,SE_o
+            ,Instruction_Mem_IFID_o[25:21]
+            ,Instruction_Mem_IFID_o[20:16]
             ,Instruction_Mem_IFID_o[15:11]})
-        .data_o({IDEX_WB_o,IDEX_M_o,IDEX_Reg_Dst_o
-            ,IDEX_ALUOp_o,IDEX_ALUSrc_o,Add_pc_IDEX_o
-            ,Reg_RS_IDEX_o,Reg_RT_IDEX_o,SE_IDEX_o
-            ,RS_addr_IDEX_o,RT_addr_IDEX_o,RD_addr_IDEX_o})
+        .data_o({IDEX_WB_o
+            ,IDEX_M_o
+            ,IDEX_Reg_Dst_o,IDEX_ALUOp_o,IDEX_ALUSrc_o
+            ,Add_pc_IDEX_o
+            ,Reg_RS_IDEX_o
+            ,Reg_RT_IDEX_o
+            ,SE_IDEX_o
+            ,RS_addr_IDEX_o
+            ,RT_addr_IDEX_o
+            ,RD_addr_IDEX_o})
 		);
 //Instantiate the components in EX stage
 MUX_2to1 #(.size(2)) Mux_IDEX_to_EXMEM_WB(
@@ -329,10 +346,19 @@ Forwarding_unit Fwd(
         .Fwd_Mux_ALUSrc_downleft_o(Fwd_Mux_ALUSrc_downleft_o)
     );
 Pipe_Reg #(.size(80)) EX_MEM(
-        .data_i({Mux_IDEX_to_EXMEM_WB_o,Mux_IDEX_to_EXMEM_M_o,Adder_IDEX_to_EXMEM_o
-            ,Zero_o,ALU_Result_o,Mux_ALUSrc_downleft_o,Mux_RegDst_o)
-        .data_o(EXMEM_WB_o,EXMEM_M_o,Adder_IDEX_to_EXMEM_EXMEM_o
-            ,Zero_EXMEM_o,ALU_Result_EXMEM_o,Mux_ALUSrc_downleft_EXMEM_o
+        .data_i({Mux_IDEX_to_EXMEM_WB_o
+            ,Mux_IDEX_to_EXMEM_M_o
+            ,Adder_IDEX_to_EXMEM_o
+            ,Zero_o
+            ,ALU_Result_o
+            ,Mux_ALUSrc_downleft_o
+            ,Mux_RegDst_o)
+        .data_o(EXMEM_WB_o
+            ,EXMEM_M_o
+            ,Adder_IDEX_to_EXMEM_EXMEM_o
+            ,Zero_EXMEM_o
+            ,ALU_Result_EXMEM_o
+            ,Mux_ALUSrc_downleft_EXMEM_o
             ,Mux_RegDst_EXMEM_o)
 		);
 
@@ -341,14 +367,20 @@ Data_Memory DM(
         .clk_i(clk_i),
         .addr_i(ALU_Result_o),
         .data_i(Mux_ALUSrc_downleft_EXMEM_o),
-        .MemRead_i(EXMEM_M_o),
-        .MemWrite_i(memwrite),
+        .MemRead_i(EXMEM_M_o[1]),
+        .MemWrite_i(EXMEM_M_o[0]),
         .data_o(Data_Memory_o)
 	    );
 
 Pipe_Reg #(.size(71)) MEM_WB(
-        .data_i(EXMEM_WB_o,Data_Memory_o,ALU_Result_EXMEM_o,Mux_RegDst_EXMEM_o),
-        .data_o(MEMWB_WB_o,Data_Memory_MEMWB_o,ALU_Result_MEMWB_o,Mux_RegDst_MEMWB_o),
+        .data_i(EXMEM_WB_o
+            ,Data_Memory_o
+            ,ALU_Result_EXMEM_o
+            ,Mux_RegDst_EXMEM_o),
+        .data_o(MEMWB_WB_o
+            ,Data_Memory_MEMWB_o
+            ,ALU_Result_MEMWB_o
+            ,Mux_RegDst_MEMWB_o),
 		);
 
 //Instantiate the components in WB stage
