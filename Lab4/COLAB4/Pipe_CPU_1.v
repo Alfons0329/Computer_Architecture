@@ -22,7 +22,7 @@ module Pipe_CPU_1(
 *
 *
 *
-*
+*	
 *
 *
 *
@@ -308,14 +308,15 @@ ALU ALU(
         //.shamt(),
         .ctrl_i(ALU_Ctrl_o),
         .result_o(ALU_Result_o),
-        .zero_o(Zero_o)
+        .zero_o(Zero_o),
+		.rst_n(rst_i)
 		);
 
 MUX_4to1 #(.size(32)) Mux_ALUSrc_up(
         .data0_i(Reg_RS_IDEX_o),
         .data1_i(ALU_Result_EXMEM_o),
         .data2_i(Mux_MEMWB_o),
-        .data3_i(32'd0),
+        //.data3_i(32'd0),
         .select_i(Fwd_Mux_ALUSrc_up_o),
         .data_o(Mux_ALUSrc_up_o)
 

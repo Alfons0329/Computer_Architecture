@@ -24,10 +24,10 @@ reg     [size-1:0] data_o;
 //Main function
 always@(*) begin
 	case(select_i)
-		1'b0: data_o = data0_i;
-		1'b1: data_o = data1_i;
-        2: data_o = data2_i;
-        3: data_o = data3_i;
+		2'd0: data_o = data0_i;
+		2'd1: data_o = data1_i;
+        2'd2: data_o = data2_i;
+        2'd3: data_o = data3_i;
 	endcase
 end
 

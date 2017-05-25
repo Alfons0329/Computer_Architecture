@@ -13,10 +13,12 @@ module ALU(
     src1_i,//rs
 	src2_i,//rt
 	ctrl_i,
+	rst_n,
+	
 	result_o,
 	zero_o,
-	shamt,
-	rst_n
+	shamt
+	
 	);
 
 //I/O ports

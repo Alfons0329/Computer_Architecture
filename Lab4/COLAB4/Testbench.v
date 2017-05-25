@@ -45,8 +45,9 @@ end
 //Print result to "CO_P4_Result.dat"
 always@(posedge CLK) begin
     count = count + 1;
-	if( count == 30 ) begin // when testing CO_P4_test3, you can change 30 to 1200 (because bubble sort needs more cycles to complete).
+	//if( count == 30 ) begin // when testing CO_P4_test3, you can change 30 to 1200 (because bubble sort needs more cycles to complete).
 	//print result to transcript 
+	$display("count is now %d \n",count);
 	$display("Register===========================================================\n");
 	$display("r0=%d, r1=%d, r2=%d, r3=%d, r4=%d, r5=%d, r6=%d, r7=%d\n",
 	cpu.RF.Reg_File[0], cpu.RF.Reg_File[1], cpu.RF.Reg_File[2], cpu.RF.Reg_File[3], cpu.RF.Reg_File[4], 
@@ -77,8 +78,8 @@ always@(posedge CLK) begin
 	cpu.DM.memory[28], cpu.DM.memory[29], cpu.DM.memory[30], cpu.DM.memory[31]
 	);
 	//$display("\nPC=%d\n",cpu.PC.pc_i);
-	end
-	else ;
+	//end
+	//else ;
 end
   
 endmodule
