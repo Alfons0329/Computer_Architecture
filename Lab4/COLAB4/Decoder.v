@@ -260,6 +260,21 @@ always@(*) begin
             MemtoReg_o = 2;//data from mem to reg
             jal = 0;
         end
+		default:// IMPORTANT TO HAVE DEFAULT
+        begin
+            ALU_op_o = 0;
+            ALUSrc_o = 0; //signextimm value
+            RegWrite_o = 0;
+            savePC_o = 0;
+            RegDst_o = 0; //i type RegDst_o=0;
+            Branch_o = 0;
+            BranchType_o = 0;
+            Jump_o = 0; //YES We jump
+            MemRead_o = 0; //read data from memory
+            MemWrite_o = 0;
+            MemtoReg_o = 0;//data from mem to reg
+            jal = 0;
+        end
 	endcase
 end
 
