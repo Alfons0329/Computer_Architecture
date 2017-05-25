@@ -83,7 +83,7 @@ wire [4:0]RT_addr_IDEX_o;
 wire [4:0]RD_addr_IDEX_o;
 ///////////////////////////////////from IDEX end/////////////////////////
 ///////////////////////////////////ALU_Ctrl//////////////////////////////
-wire [3:0]ALU_Ctrl_o;
+wire [4:0]ALU_Ctrl_o;
 //////////////////////////////////////////////////////////////////////////
 ///////////////////////////////////Mux_IDEX_to_EXMEM_WB//////////////////
 wire [1:0]Mux_IDEX_to_EXMEM_WB_o;
@@ -111,7 +111,7 @@ wire [31:0]Mux_ALUSrc_downleft_o;
 wire [31:0]Mux_ALUSrc_downright_o;
 /////////////////////////////////////////////////////////////////////////
 //////////////////////////////////Mux_RegDst///////////////
-wire [31:0]Mux_RegDst_o;
+wire [4:0]Mux_RegDst_o;
 /////////////////////////////////////////////////////////////////////////
 //control signal
 /////////////////////////////////Forwarding_unit/////////////////////////
@@ -175,7 +175,7 @@ MUX_2to1 #(.size(32))Mux_PC_Source(
 ProgramCounter PC(
         .clk_i(clk_i),
         .rst_i (rst_i),
-        .pc_control(~Haz_pc_o),//for avoiding the unknown circumstance  2017/5/24
+        .pc_control(Haz_pc_o),//for avoiding the unknown circumstance  2017/5/24
         .pc_in_i(Mux_PC_Source_o) ,
         .pc_out_o(pc_im)
         );
@@ -204,11 +204,12 @@ Pipe_Reg_IFID #(.size(64)) IF_ID(       //N is the total length of input/output
 		);
 
 //Instantiate the components in ID stage
+//control_o={RegWrite_o,MemRead_o,Branch_o,MemRead_o,MemWrite_o,RegDst_o,ALU_op_o,ALUSrc_o};
 Hazard_detection_unit Haz(
     .RS_addr_IFID_i(Instruction_Mem_IFID_o[25:21]),
     .RT_addr_IFID_i(Instruction_Mem_IFID_o[20:16]),
     .RT_addr_IDEX_i(RT_addr_IDEX_o),
-    .MemRead_IDEX_i(IDEX_M_o),
+    .MemRead_IDEX_i(IDEX_M_o[1]),
 
     .Haz_pc_o(Haz_pc_o),
     .Haz_IFID_o(Haz_IFID_o),
@@ -216,11 +217,13 @@ Hazard_detection_unit Haz(
     .Haz_EX_Flush_o(Haz_EX_Flush_o),
     .Haz_ID_Flush_o(Haz_ID_Flush_o)
     );
+////
 Decoder Control(
+	.rst_i(rst_i),
     .instr_op_i(Instruction_Mem_IFID_o[31:26]),
     .control_o(control_o)
 		);
-MUX_4to1 #(.size(12)) Mux_Control(
+MUX_2to1 #(.size(12)) Mux_Control(
         .data0_i(control_o),
         .data1_i(12'd0),
         .select_i(Haz_ID_Flush_o),
@@ -247,6 +250,10 @@ Sign_Extend Sign_Extend(
 		);
 //control_o={RegWrite_o,MemRead_o,Branch_o,MemRead_o,MemWrite_o,RegDst_o,ALU_op_o,ALUSrc_o};
 Pipe_Reg #(.size(155)) ID_EX(
+	    .clk_i(clk_i),
+        .rst_i(rst_i),
+
+
         .data_i({Mux_Control_o[11:10]
             ,Mux_Control_o[9:7]
             ,Mux_Control_o[6:0]
@@ -345,7 +352,11 @@ Forwarding_unit Fwd(
         .Fwd_Mux_ALUSrc_up_o(Fwd_Mux_ALUSrc_up_o),
         .Fwd_Mux_ALUSrc_downleft_o(Fwd_Mux_ALUSrc_downleft_o)
     );
-Pipe_Reg #(.size(80)) EX_MEM(
+Pipe_Reg #(.size(107)) EX_MEM(
+        .clk_i(clk_i),
+        .rst_i(rst_i),
+		
+		
         .data_i({Mux_IDEX_to_EXMEM_WB_o
             ,Mux_IDEX_to_EXMEM_M_o
             ,Adder_IDEX_to_EXMEM_o
@@ -373,7 +384,11 @@ Data_Memory DM(
 	    );
 
 Pipe_Reg #(.size(71)) MEM_WB(
-        .data_i({EXMEM_WB_o
+
+		.clk_i(clk_i),
+        .rst_i(rst_i),
+        
+		.data_i({EXMEM_WB_o
             ,Data_Memory_o
             ,ALU_Result_EXMEM_o
             ,Mux_RegDst_EXMEM_o}),
@@ -385,6 +400,7 @@ Pipe_Reg #(.size(71)) MEM_WB(
 
 //Instantiate the components in WB stage
 MUX_2to1 #(.size(32)) Mux_MEMWB(
+	
         .data0_i(Data_Memory_MEMWB_o),
         .data1_i(ALU_Result_MEMWB_o),
         .select_i(~MEMWB_WB_o[0]), //Inverse selection since the diagram is up0 down 1

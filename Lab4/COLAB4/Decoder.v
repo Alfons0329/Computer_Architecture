@@ -10,17 +10,19 @@
 //--------------------------------------------------------------------------------
 
 module Decoder(
+	rst_i,
     instr_op_i,
 	control_o
 	);
 
 //I/O ports
+input          rst_i;
 input  [6-1:0] instr_op_i;
 
 reg         RegWrite_o;
 reg[5-1:0]  ALU_op_o;
 reg         ALUSrc_o;
-reg[2-1:0]  RegDst_o;
+reg  RegDst_o;
 //0 i type 1 r type 2 save PC+8
 reg         Branch_o;
 reg [3-1:0] BranchType_o;
@@ -33,19 +35,16 @@ reg [2-1:0] MemtoReg_o;
 
 //
 reg jal;
-//Internal Signals
-/*reg[5-1:0] ALU_op_o;
-reg        ALUSrc_o;
-reg        RegWrite_o;
-reg[2-1:0] RegDst_o;
-reg        Branch_o;*/
 reg        savePC_o;
 //Parameter
 
 output reg [11:0] control_o;
-always@(instr_op_i)
+always@(*)
 begin
-    control_o={RegWrite_o,MemRead_o,Branch_o,MemRead_o,MemWrite_o,RegDst_o,ALU_op_o,ALUSrc_o};
+    if(!rst_i)
+		control_o=12'b0;
+	else
+		control_o={RegWrite_o,MemRead_o,Branch_o,MemRead_o,MemWrite_o,RegDst_o,ALU_op_o,ALUSrc_o};
 end
 
 //Main function

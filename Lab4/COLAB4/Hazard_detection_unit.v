@@ -18,7 +18,7 @@ input MemRead_IDEX_i;
 
 output reg Haz_pc_o;
 output reg Haz_IFID_o;
-output reg Haz_IF_Flush_o;
+output reg Haz_IF_Flush_o; //for control hazard
 output reg Haz_EX_Flush_o;
 output reg Haz_ID_Flush_o; //if Haz_ID_Flush_o is 1 then the  Mux_Control will get signal 1 to assign the value 0 making the
 //IDEX register to be 0 and thus flush the instructions before
@@ -34,14 +34,14 @@ begin
 	begin
 		Haz_pc_o=0;
 		Haz_IFID_o=1;
-		Haz_IF_Flush_o=1;
+		Haz_ID_Flush_o=1;
 		Haz_EX_Flush_o=1;
 	end
 	else
 	begin
 		Haz_pc_o=1;
 		Haz_IFID_o=0;
-		Haz_IF_Flush_o=0;
+		Haz_ID_Flush_o=0;
 		Haz_EX_Flush_o=0;	
 	end
 end
