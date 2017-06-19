@@ -105,6 +105,9 @@ void simulate(int associativity,int cache_size, int block_size, string& fileName
 	cout<<"totalAccess:  "<<totalAccess<<endl;
 	cout<<"miss rate:    "<<(double)missCnt/(double)totalAccess<<endl;
 	cout<<endl;
+	for(int i=0;i<line;++i){
+        delete [] cache[i];
+    }
 	delete [] cache;
 }
 
