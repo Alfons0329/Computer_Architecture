@@ -251,8 +251,8 @@ always@(*) begin
             MemtoReg_o = 0;//data from mem to reg
             jal = 0;
         end
-        6'hf:　//li
-        begin
+        6'hf:
+		  begin
             ALU_op_o = 13;
             ALUSrc_o = 0; //signextimm value
             RegWrite_o = 1;

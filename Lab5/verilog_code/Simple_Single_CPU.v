@@ -10,12 +10,12 @@
 //--------------------------------------------------------------------------------
 module CPU(
         clk_i,
-		rst_i
+		start_i
 		);
 
 //I/O port
 input         clk_i;
-input         rst_i;
+input         start_i;
 
 wire [31:0]instruction;
 //Internal Signles
@@ -88,7 +88,7 @@ MUX_2to1 #(.size(32))PC_Source(
     );
 ProgramCounter PC(
         .clk_i(clk_i),
-	    .rst_i (rst_i),
+	    .rst_i (start_i),
 	    .pc_in_i(Mux_PC_Source_o) ,
 	    .pc_out_o(pc_im)
 	    );
@@ -128,7 +128,7 @@ MUX_2to1 Mux_Write_Data_Select(
     );
 Reg_File RF(
         .clk_i(clk_i),
-	    .rst_i(rst_i) ,
+	    .rst_i(start_i) ,
         .RSaddr_i(instruction[25:21]) ,
         .RTaddr_i(instruction[20:16]) ,
         .RDaddr_i(Mux_Write_Reg_Select_o) ,
@@ -180,9 +180,9 @@ ALU ALU(
 	    .result_o(alu_result_o),
 		.zero_o(zero_and),
 		.shamt(instruction[10:6]),
-		.rst_n(rst_i)
+		.rst_n(start_i)
 	    );
-Data_Memory Data_Memory(
+Data_Memory DM(
     .clk_i(clk_i),
     .addr_i(alu_result_o),
     .data_i(rd2_mux2),

@@ -3,7 +3,8 @@
 #include <math.h>
 #include <vector>
 #include <string>
-
+#include <fstream>
+#include <iomanip>
 using namespace std;
 
 struct cache_content
@@ -99,11 +100,16 @@ void simulate(int associativity,int cache_size, int block_size, string& fileName
 	}
 
 	fclose(fp);
+
+	ofstream advancedFile;
+	advancedFile.open("advancedAns.txt",std::ios_base::app);
 	cout<<"fileName:  "<<fileName<<endl;
 	cout<<"cacheSize:  "<<cache_size/K<<"K "<<endl;
 	cout<<"blockSize:  "<<block_size<<endl;
+	cout<<"associativity:  "<<associativity<<endl;
 	cout<<"totalAccess:  "<<totalAccess<<endl;
 	cout<<"miss rate:    "<<(double)missCnt/(double)totalAccess<<endl;
+	advancedFile<<"fileName:  "<<setw(11)<<fileName<<"  cahceSize:  "<<setw(4)<<cache_size/K<<"K "<<"  blockSize:  "<<block_size<<"  associativity:  "<<associativity<<"  miss rate:    "<<(double)missCnt/(double)totalAccess<<endl;
 	cout<<endl;
 	for(int i=0;i<line;++i){
         delete [] cache[i];
